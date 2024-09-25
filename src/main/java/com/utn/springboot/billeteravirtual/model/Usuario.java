@@ -1,5 +1,6 @@
 package com.utn.springboot.billeteravirtual.model;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 
@@ -13,9 +14,11 @@ public class Usuario {
     @Size(min = 3, max = 50, message = "El nombre del usuario debe tener entre 3 y 50 caracteres")
     private String nombre;
     @Schema(description = "Correo electrónico del usuario", example = "mai@example.com")
+    @NotNull
     @Email
     private String email;
     @Schema(description = "Edad del usuario", example = "34")
+    @NotNull
     @Min(18)
     @Max(99)
     private int edad;
@@ -63,6 +66,18 @@ public class Usuario {
 
     public void setEdad(Integer edad) {
         this.edad = edad;
+    }
+
+    @Override
+    public String toString() {
+        return """
+                {
+                    "id": %d,
+                    "nombre": "%s",
+                    "email": "%s",
+                    "edad": %d
+                }
+                """.formatted(id, nombre, email, edad);
     }
 }
 

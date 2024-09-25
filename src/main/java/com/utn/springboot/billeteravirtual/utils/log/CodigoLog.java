@@ -1,9 +1,10 @@
 package com.utn.springboot.billeteravirtual.utils.log;
 
 public enum CodigoLog {
-    CREAR_USUARIO("CREAR_USUARIO", "Usuario creado con éxito"),
-    ACTUALIZAR_USUARIO("ACTUALIZAR_USUARIO", "Usuario actualizado con éxito"),
-    ELIMINAR_USUARIO("ELIMINAR_USUARIO", "Usuario eliminado con éxito");
+    USUARIO_CREADO("USUARIO_CREADO", "Usuario creado con éxito"),
+    USUARIO_ACTUALIZADO("USUARIO_ACTUALIZADO", "Usuario actualizado con éxito"),
+    USUARIO_ELIMINADO("USUARIO_ELIMINADO", "Usuario eliminado con éxito"),
+    USUARIO_NO_ENCONTRADO("USUARIO_NO_ENCONTRADO", "Usuario no encontrado");
 
     private final String codigo;
     private final String descripcion;

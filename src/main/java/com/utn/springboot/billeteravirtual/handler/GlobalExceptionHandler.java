@@ -1,11 +1,15 @@
 package com.utn.springboot.billeteravirtual.handler;
 
 import com.utn.springboot.billeteravirtual.exception.UsuarioNoEncontradoException;
+import com.utn.springboot.billeteravirtual.utils.log.CodigoLog;
+import com.utn.springboot.billeteravirtual.utils.log.Log;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -19,6 +23,13 @@ import java.util.Map;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    private final Log log;
+
+    @Autowired
+    public GlobalExceptionHandler(@Qualifier("fileLog") Log log) {
+        this.log = log;
+    }
+
     // @ExceptionHandler indica que este método maneja excepciones de tipo UsuarioNoEncontradoException.
     // Si se lanza una excepción de este tipo, el método recibe un objeto UsuarioNoEncontradoException y devuelve un ResponseEntity con
     // el mensaje de error y el código de estado HTTP 404 (NOT_FOUND).
@@ -30,6 +41,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Long>> handleUsuarioNoEncontrado(UsuarioNoEncontradoException ex) {
         Map<String, Long> errores = new HashMap<>();
         errores.put("id", ex.getId());
+        log.registrarAccion(CodigoLog.USUARIO_NO_ENCONTRADO, ex.getId());
         return new ResponseEntity<>(errores, HttpStatus.NOT_FOUND);
     }
 

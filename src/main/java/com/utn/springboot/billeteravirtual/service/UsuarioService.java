@@ -1,14 +1,17 @@
 package com.utn.springboot.billeteravirtual.service;
 
+import com.utn.springboot.billeteravirtual.controller.OrdenUsuario;
 import com.utn.springboot.billeteravirtual.exception.UsuarioNoEncontradoException;
 import com.utn.springboot.billeteravirtual.model.Usuario;
 import com.utn.springboot.billeteravirtual.utils.Utilidades;
+import com.utn.springboot.billeteravirtual.utils.log.CodigoLog;
 import com.utn.springboot.billeteravirtual.utils.log.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 // Esta clase deberá tener la lógica de negocio para poder realizar las operaciones CRUD de la entidad Usuario.
@@ -33,30 +36,93 @@ public class UsuarioService {
     }
 
     // Método para obtener todos los usuarios
-    public List<Usuario> obtenerTodosLosUsuarios() {
+    public List<Usuario> obtenerTodos() {
         return usuarios;
     }
 
-    // Método para crear un nuevo usuario
+    public Usuario buscarUsuario(Long id) throws UsuarioNoEncontradoException {
+        return usuarios.stream().filter(usuario -> usuario.getId().equals(id)).findFirst().orElseThrow(() -> new UsuarioNoEncontradoException(id));
+    }
+
+    // Método para buscar usuarios por nombre y rango de edad. Si alguno de los parámetros es null, no se aplicará el filtro.
+    // El orden de los usuarios será por ID.
+    public List<Usuario> buscarUsuarios(String nombre, Integer edadMin, Integer edadMax) {
+        return usuarios.stream()
+                .filter(usuario -> nombre == null || usuario.getNombre().toUpperCase().contains(nombre.toUpperCase()))
+                .filter(usuario -> edadMin == null || usuario.getEdad() >= edadMin)
+                .filter(usuario -> edadMax == null || usuario.getEdad() <= edadMax)
+                .sorted(Comparator.comparing(Usuario::getId))
+                .toList();
+    }
+
+    // Método para buscar usuarios por nombre y rango de edad. Si alguno de los parámetros es null, no se aplicará el filtro.
+    // El orden de los usuarios será el especificado en el parámetro orden.
+    public List<Usuario> buscarUsuarios(String nombre, Integer edadMin, Integer edadMax, OrdenUsuario orden) {
+        return usuarios.stream()
+                .filter(usuario -> nombre == null || usuario.getNombre().toUpperCase().contains(nombre.toUpperCase()))
+                .filter(usuario -> edadMin == null || usuario.getEdad() >= edadMin)
+                .filter(usuario -> edadMax == null || usuario.getEdad() <= edadMax)
+                .sorted(orden.getComparator())
+                .toList();
+    }
+
+    // Método para crear un nuevo usuario.
+    // El ID del usuario será el siguiente al último usuario registrado.
+    // El nombre del usuario será formateado a mayúsculas y sin espacios al principio y al final.
+    // El email del usuario será formateado a minúsculas.
+    // El método devolverá el usuario creado.
     public Usuario crearUsuario(Usuario usuario) {
         usuario.setId((long) (usuarios.size() + 1)); // Asignar ID al usuario nuevo
         String nombre = utilidades.formatearTexto(usuario.getNombre());
         usuario.setNombre(nombre);
+        usuario.setEmail(usuario.getEmail().toLowerCase());
         usuarios.add(usuario);
+        log.registrarAccion(CodigoLog.USUARIO_CREADO, usuario);
         return usuario;
     }
 
     // Método para actualizar un usuario existente. Si el usuario no existe, se lanzará una excepción UsuarioNoEncontradoException.
+    // El nombre del usuario será formateado a mayúsculas y sin espacios al principio y al final.
+    // El email del usuario será formateado a minúsculas.
+    // El método devolverá el usuario actualizado.
     public Usuario actualizarUsuario(Long id, Usuario usuarioActualizado) throws UsuarioNoEncontradoException {
-        return usuarios.stream().filter(usuario -> usuario.getId().equals(id)).peek(usuario -> {
-            usuario.setNombre(usuarioActualizado.getNombre());
-            usuario.setEmail(usuarioActualizado.getEmail());
+        Usuario usuarioRetorno = usuarios.stream().filter(usuario -> usuario.getId().equals(id)).peek(usuario -> {
+            usuario.setNombre(utilidades.formatearTexto(usuarioActualizado.getNombre()));
+            usuario.setEmail(usuarioActualizado.getEmail().toLowerCase());
             usuario.setEdad(usuarioActualizado.getEdad());
         }).findFirst().orElseThrow(() -> new UsuarioNoEncontradoException(id));
+
+        log.registrarAccion(CodigoLog.USUARIO_ACTUALIZADO, usuarioRetorno);
+        return usuarioRetorno;
+    }
+
+    // Método para actualizar parcialmente un usuario existente. Si el usuario no existe, se lanzará una excepción
+    // UsuarioNoEncontradoException.
+    // Si un atributo del usuario actualizado es null, no se actualizará.
+    // El nombre del usuario será formateado a mayúsculas y sin espacios al principio y al final.
+    // El email del usuario será formateado a minúsculas.
+    // El método devolverá el usuario actualizado.
+    public Usuario actualizarUsuarioParcial(Long id, Usuario usuarioActualizado) throws UsuarioNoEncontradoException {
+        Usuario usuarioRetorno = usuarios.stream().filter(usuario -> usuario.getId().equals(id)).peek(usuario -> {
+            if (usuarioActualizado.getNombre() != null) {
+                usuario.setNombre(utilidades.formatearTexto(usuarioActualizado.getNombre()));
+            }
+            if (usuarioActualizado.getEmail() != null) {
+                usuario.setEmail(usuarioActualizado.getEmail().toLowerCase());
+            }
+            if (usuarioActualizado.getEdad() != null) {
+                usuario.setEdad(usuarioActualizado.getEdad());
+            }
+        }).findFirst().orElseThrow(() -> new UsuarioNoEncontradoException(id));
+
+        log.registrarAccion(CodigoLog.USUARIO_ACTUALIZADO, usuarioRetorno);
+        return usuarioRetorno;
     }
 
     // Método para eliminar un usuario por ID. Devuelve true si el usuario fue eliminado, false en caso contrario.
     public boolean eliminarUsuario(Long id) {
-        return usuarios.removeIf(usuario -> usuario.getId().equals(id));
+        boolean resultado = usuarios.removeIf(usuario -> usuario.getId().equals(id));
+        if (resultado) log.registrarAccion(CodigoLog.USUARIO_ELIMINADO, id);
+        return resultado;
     }
 }

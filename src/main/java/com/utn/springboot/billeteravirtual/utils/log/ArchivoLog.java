@@ -5,12 +5,18 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Component("fileLog")
-public class FileLogService implements Log {
-    private final Logger logger = LoggerFactory.getLogger(ConsoleLog.class);
+public class ArchivoLog implements Log {
+    private final Logger logger = LoggerFactory.getLogger(ConsolaLog.class);
 
     @Override
     public void registrarAccion(CodigoLog codigoLog) {
         String logMessage = "FileLog: Acción: " + codigoLog.getCodigo() + " - " + codigoLog.getDescripcion();
+        escribirEnArchivo(logMessage);
+    }
+
+    @Override
+    public <T> void registrarAccion(CodigoLog codigoLog, T object) {
+        String logMessage = "FileLog: Acción: " + codigoLog.getCodigo() + " - " + codigoLog.getDescripcion() + " - " + object.toString();
         escribirEnArchivo(logMessage);
     }
 
