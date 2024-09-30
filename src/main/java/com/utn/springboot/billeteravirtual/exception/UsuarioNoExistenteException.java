@@ -1,9 +1,9 @@
 package com.utn.springboot.billeteravirtual.exception;
 
-public class UsuarioNoEncontradoException extends RuntimeException {
+public class UsuarioNoExistenteException extends RuntimeException {
     private final Long id;
 
-    public UsuarioNoEncontradoException(Long id) {
+    public UsuarioNoExistenteException(Long id) {
         super("Usuario con ID " + id + " no encontrado.");
         this.id = id;
     }

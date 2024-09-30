@@ -1,6 +1,9 @@
 package com.utn.springboot.billeteravirtual.handler;
 
-import com.utn.springboot.billeteravirtual.exception.UsuarioNoEncontradoException;
+import com.utn.springboot.billeteravirtual.exception.CuentaNoExistenteException;
+import com.utn.springboot.billeteravirtual.exception.MonedaInvalidaException;
+import com.utn.springboot.billeteravirtual.exception.SaldoInsuficienteException;
+import com.utn.springboot.billeteravirtual.exception.UsuarioNoExistenteException;
 import com.utn.springboot.billeteravirtual.utils.log.CodigoLog;
 import com.utn.springboot.billeteravirtual.utils.log.Log;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -35,10 +38,11 @@ public class GlobalExceptionHandler {
     // el mensaje de error y el código de estado HTTP 404 (NOT_FOUND).
     @ApiResponses(value = {
             @ApiResponse(responseCode = "404", description = "Usuario no encontrado",
-                    content = @Content(schema = @Schema(implementation = Map.Entry.class), examples = @ExampleObject(value = "{ \"id\": 1 }")))
+                    content = @Content(schema = @Schema(implementation = Map.Entry.class), examples = @ExampleObject(value = "{ \"id\": 1" +
+                            " }")))
     })
-    @ExceptionHandler(UsuarioNoEncontradoException.class)
-    public ResponseEntity<Map<String, Long>> handleUsuarioNoEncontrado(UsuarioNoEncontradoException ex) {
+    @ExceptionHandler(UsuarioNoExistenteException.class)
+    public ResponseEntity<Map<String, Long>> handleUsuarioNoEncontrado(UsuarioNoExistenteException ex) {
         Map<String, Long> errores = new HashMap<>();
         errores.put("id", ex.getId());
         log.registrarAccion(CodigoLog.USUARIO_NO_ENCONTRADO, ex.getId());
@@ -54,7 +58,8 @@ public class GlobalExceptionHandler {
     // estar vacío".
     @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "Error de validación",
-                    content = @Content(schema = @Schema(implementation = Map.Entry.class), examples = @ExampleObject(value = "{ \"nombre\": \"no puede estar vacío\" }")))
+                    content = @Content(schema = @Schema(implementation = Map.Entry.class), examples = @ExampleObject(value = "{ \"nombre" +
+                            "\": \"no puede estar vacío\" }")))
     })
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
@@ -62,5 +67,20 @@ public class GlobalExceptionHandler {
         // Se recorren los errores de validación y se guardan en un mapa con el nombre del campo y el mensaje de error.
         ex.getBindingResult().getFieldErrors().forEach(error -> errores.put(error.getField(), error.getDefaultMessage()));
         return new ResponseEntity<>(errores, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(CuentaNoExistenteException.class)
+    public ResponseEntity<String> handleCuentaNoExistente(CuentaNoExistenteException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(MonedaInvalidaException.class)
+    public ResponseEntity<String> handleMonedaInvalida(MonedaInvalidaException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(SaldoInsuficienteException.class)
+    public ResponseEntity<String> handleSaldoInsuficiente(SaldoInsuficienteException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 }

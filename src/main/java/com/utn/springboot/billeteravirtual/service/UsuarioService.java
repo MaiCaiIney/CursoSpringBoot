@@ -1,7 +1,7 @@
 package com.utn.springboot.billeteravirtual.service;
 
 import com.utn.springboot.billeteravirtual.controller.OrdenUsuario;
-import com.utn.springboot.billeteravirtual.exception.UsuarioNoEncontradoException;
+import com.utn.springboot.billeteravirtual.exception.UsuarioNoExistenteException;
 import com.utn.springboot.billeteravirtual.model.Usuario;
 import com.utn.springboot.billeteravirtual.utils.Utilidades;
 import com.utn.springboot.billeteravirtual.utils.log.CodigoLog;
@@ -40,8 +40,8 @@ public class UsuarioService {
         return usuarios;
     }
 
-    public Usuario buscarUsuario(Long id) throws UsuarioNoEncontradoException {
-        return usuarios.stream().filter(usuario -> usuario.getId().equals(id)).findFirst().orElseThrow(() -> new UsuarioNoEncontradoException(id));
+    public Usuario buscarUsuario(Long id) throws UsuarioNoExistenteException {
+        return usuarios.stream().filter(usuario -> usuario.getId().equals(id)).findFirst().orElseThrow(() -> new UsuarioNoExistenteException(id));
     }
 
     // Método para buscar usuarios por nombre y rango de edad. Si alguno de los parámetros es null, no se aplicará el filtro.
@@ -81,28 +81,13 @@ public class UsuarioService {
         return usuario;
     }
 
-    // Método para actualizar un usuario existente. Si el usuario no existe, se lanzará una excepción UsuarioNoEncontradoException.
-    // El nombre del usuario será formateado a mayúsculas y sin espacios al principio y al final.
-    // El email del usuario será formateado a minúsculas.
-    // El método devolverá el usuario actualizado.
-    public Usuario actualizarUsuario(Long id, Usuario usuarioActualizado) throws UsuarioNoEncontradoException {
-        Usuario usuarioRetorno = usuarios.stream().filter(usuario -> usuario.getId().equals(id)).peek(usuario -> {
-            usuario.setNombre(utilidades.formatearTexto(usuarioActualizado.getNombre()));
-            usuario.setEmail(usuarioActualizado.getEmail().toLowerCase());
-            usuario.setEdad(usuarioActualizado.getEdad());
-        }).findFirst().orElseThrow(() -> new UsuarioNoEncontradoException(id));
-
-        log.registrarAccion(CodigoLog.USUARIO_ACTUALIZADO, usuarioRetorno);
-        return usuarioRetorno;
-    }
-
     // Método para actualizar parcialmente un usuario existente. Si el usuario no existe, se lanzará una excepción
     // UsuarioNoEncontradoException.
     // Si un atributo del usuario actualizado es null, no se actualizará.
     // El nombre del usuario será formateado a mayúsculas y sin espacios al principio y al final.
     // El email del usuario será formateado a minúsculas.
     // El método devolverá el usuario actualizado.
-    public Usuario actualizarUsuarioParcial(Long id, Usuario usuarioActualizado) throws UsuarioNoEncontradoException {
+    public Usuario actualizarUsuarioParcial(Long id, Usuario usuarioActualizado) throws UsuarioNoExistenteException {
         Usuario usuarioRetorno = usuarios.stream().filter(usuario -> usuario.getId().equals(id)).peek(usuario -> {
             if (usuarioActualizado.getNombre() != null) {
                 usuario.setNombre(utilidades.formatearTexto(usuarioActualizado.getNombre()));
@@ -113,7 +98,7 @@ public class UsuarioService {
             if (usuarioActualizado.getEdad() != null) {
                 usuario.setEdad(usuarioActualizado.getEdad());
             }
-        }).findFirst().orElseThrow(() -> new UsuarioNoEncontradoException(id));
+        }).findFirst().orElseThrow(() -> new UsuarioNoExistenteException(id));
 
         log.registrarAccion(CodigoLog.USUARIO_ACTUALIZADO, usuarioRetorno);
         return usuarioRetorno;

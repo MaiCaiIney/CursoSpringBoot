@@ -1,30 +1,21 @@
 package com.utn.springboot.billeteravirtual.model;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.*;
+import com.utn.springboot.billeteravirtual.model.cuentas.Cuenta;
 
-@Schema(description = "Clase que representa un usuario")
+import java.util.ArrayList;
+import java.util.List;
+
 public class Usuario {
-    @Schema(description = "Identificador único del usuario", example = "1")
+    private final List<Cuenta> cuentas = new ArrayList<>();
     private Long id;
-    // @JsonProperty("nombreCompleto") es un ejemplo de cómo se puede cambiar el nombre de un atributo en el JSON.
-    @Schema(description = "Nombre completo del usuario", example = "Mai Prueba")
-    @NotNull
-    @Size(min = 3, max = 50, message = "El nombre del usuario debe tener entre 3 y 50 caracteres")
     private String nombre;
-    @Schema(description = "Correo electrónico del usuario", example = "mai@example.com")
-    @NotNull
-    @Email
     private String email;
-    @Schema(description = "Edad del usuario", example = "34")
-    @NotNull
-    @Min(18)
-    @Max(99)
     private int edad;
 
-    // Constructor vacío
-    public Usuario() {
+    public Usuario(String nombre, String email, int edad) {
+        this.nombre = nombre;
+        this.email = email;
+        this.edad = edad;
     }
 
     // Constructor con parámetros
@@ -66,6 +57,14 @@ public class Usuario {
 
     public void setEdad(Integer edad) {
         this.edad = edad;
+    }
+
+    public List<Cuenta> getCuentas() {
+        return cuentas;
+    }
+
+    public void agregarCuenta(Cuenta cuenta) {
+        cuentas.add(cuenta);
     }
 
     @Override

@@ -1,7 +1,10 @@
 package com.utn.springboot.billeteravirtual.controller;
 
-import com.utn.springboot.billeteravirtual.exception.UsuarioNoEncontradoException;
+import com.utn.springboot.billeteravirtual.dto.UsuarioRequest;
+import com.utn.springboot.billeteravirtual.exception.UsuarioNoExistenteException;
 import com.utn.springboot.billeteravirtual.model.Usuario;
+import com.utn.springboot.billeteravirtual.model.cuentas.Cuenta;
+import com.utn.springboot.billeteravirtual.service.CuentaService;
 import com.utn.springboot.billeteravirtual.service.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -26,12 +29,14 @@ import java.util.Map;
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
+    private final CuentaService cuentaService;
 
     // La anotación @Autowired se utiliza para inyectar una instancia de UsuarioService en esta clase.
     // Spring buscará una instancia de UsuarioService y la inyectará automáticamente en el constructor.
     @Autowired
-    public UsuarioController(UsuarioService usuarioService) {
+    public UsuarioController(UsuarioService usuarioService, CuentaService cuentaService) {
         this.usuarioService = usuarioService;
+        this.cuentaService = cuentaService;
     }
 
     // 1. Obtener una lista de usuarios
@@ -93,31 +98,12 @@ public class UsuarioController {
     @ResponseStatus(HttpStatus.CREATED)
     public Usuario crearUsuario(
             @Parameter(description = "Datos del nuevo usuario")
-            @Valid @RequestBody Usuario nuevoUsuario) {
+            @Valid @RequestBody UsuarioRequest request) {
+        Usuario nuevoUsuario = new Usuario(request.getNombre(), request.getEmail(), request.getEdad());
         return usuarioService.crearUsuario(nuevoUsuario);
     }
 
-    // 4. Actualizar un usuario
-    // @PutMapping indica que este método maneja las solicitudes PUT a la URL /usuarios/{id}.
-    // El método utiliza el servicio UsuarioService para actualizar un usuario existente. Toda la lógica de actualización se maneja en el
-    // servicio.
-    @Operation(summary = "Actualizar un usuario")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Usuario actualizado con éxito"),
-            @ApiResponse(responseCode = "400", description = "Datos del usuario inválidos", content = @Content(schema =
-            @Schema(implementation = Map.Entry.class), examples = @ExampleObject(value = "{ \"nombre\": \"no puede estar vacío\" }"))),
-            @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
-    })
-    @PutMapping("/{id}")
-    public Usuario actualizarUsuario(
-            @Parameter(description = "ID del usuario a actualizar", example = "1")
-            @PathVariable Long id,
-            @Parameter(description = "Datos actualizados del usuario")
-            @Valid @RequestBody Usuario usuarioActualizado) {
-        return usuarioService.actualizarUsuario(id, usuarioActualizado);
-    }
-
-    // 5. Actualizar parcialmente un usuario
+    // 4. Actualizar parcialmente un usuario
     // @PatchMapping indica que este método maneja las solicitudes PATCH a la URL /usuarios/{id}.
     // El método utiliza el servicio UsuarioService para actualizar parcialmente un usuario existente. Toda la lógica de actualización se
     // maneja en el servicio.
@@ -131,11 +117,12 @@ public class UsuarioController {
             @Parameter(description = "ID del usuario a actualizar", example = "1")
             @PathVariable Long id,
             @Parameter(description = "Datos actualizados del usuario")
-            @RequestBody Usuario datosActualizados) {
+            @RequestBody UsuarioRequest request) {
+        Usuario datosActualizados = new Usuario(request.getNombre(), request.getEmail(), request.getEdad());
         return usuarioService.actualizarUsuarioParcial(id, datosActualizados);
     }
 
-    // 6. Eliminar un usuario
+    // 5. Eliminar un usuario
     // @DeleteMapping indica que este método maneja las solicitudes DELETE a la URL /usuarios/{id}.
     // El método utiliza el servicio UsuarioService para eliminar un usuario existente. Si el método del servicio devuelve false, se
     // lanza una excepción UsuarioNoEncontradoException.
@@ -153,7 +140,22 @@ public class UsuarioController {
         boolean usuarioEliminado = usuarioService.eliminarUsuario(id);
 
         if (!usuarioEliminado) {
-            throw new UsuarioNoEncontradoException(id);
+            throw new UsuarioNoExistenteException(id);
         }
+    }
+
+    // 6. Obtener cuentas de un usuario
+    // @GetMapping indica que este método maneja las solicitudes GET a la URL /usuarios/{id}/cuentas.
+    // El método utiliza el servicio UsuarioService para obtener las cuentas de un usuario por ID.
+    @Operation(summary = "Obtener cuentas de un usuario")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Cuentas obtenidas con éxito"),
+            @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
+    })
+    @GetMapping("/{id}/cuentas")
+    public List<Cuenta> obtenerCuentasPorUsuario(
+            @Parameter(description = "ID del usuario para obtener sus cuentas", example = "1")
+            @PathVariable Long id) {
+        return cuentaService.obtenerCuentasPorUsuario(id);
     }
 }
