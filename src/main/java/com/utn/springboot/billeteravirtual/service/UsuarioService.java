@@ -1,8 +1,10 @@
 package com.utn.springboot.billeteravirtual.service;
 
 import com.utn.springboot.billeteravirtual.controller.OrdenUsuario;
+import com.utn.springboot.billeteravirtual.entity.UsuarioEntity;
 import com.utn.springboot.billeteravirtual.exception.UsuarioNoExistenteException;
 import com.utn.springboot.billeteravirtual.model.Usuario;
+import com.utn.springboot.billeteravirtual.repository.UsuarioRepository;
 import com.utn.springboot.billeteravirtual.utils.Utilidades;
 import com.utn.springboot.billeteravirtual.utils.log.CodigoLog;
 import com.utn.springboot.billeteravirtual.utils.log.Log;
@@ -13,17 +15,21 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 // Esta clase deberá tener la lógica de negocio para poder realizar las operaciones CRUD de la entidad Usuario.
 // La anotación @Service indica que esta clase es un servicio. En Spring, los servicios son clases que contienen la lógica de negocio.
 @Service
 public class UsuarioService {
     private final List<Usuario> usuarios = new ArrayList<>();
+
+    private final UsuarioRepository repository;
     private final Utilidades utilidades;
     private final Log log;
 
     @Autowired
-    public UsuarioService(Utilidades utilidades, @Qualifier("consoleLog") Log logService) {
+    public UsuarioService(UsuarioRepository repository, Utilidades utilidades, @Qualifier("consoleLog") Log logService) {
+        this.repository = repository;
         this.utilidades = utilidades;
         this.log = logService;
         usuarios.add(new Usuario(1L, "Juan Perez", "juan@example.com", 41));
@@ -37,33 +43,57 @@ public class UsuarioService {
 
     // Método para obtener todos los usuarios
     public List<Usuario> obtenerTodos() {
-        return usuarios;
+        return repository.findAll().stream().map(usuarioEntity -> new Usuario(usuarioEntity.getId(), usuarioEntity.getNombre(),
+                                                                       usuarioEntity.getEmail(), usuarioEntity.getEdad())).collect(Collectors.toList());
     }
 
     public Usuario buscarUsuario(Long id) throws UsuarioNoExistenteException {
-        return usuarios.stream().filter(usuario -> usuario.getId().equals(id)).findFirst().orElseThrow(() -> new UsuarioNoExistenteException(id));
+        return repository.findById(id).map(usuarioEntity -> new Usuario(usuarioEntity.getId(), usuarioEntity.getNombre(),
+                                                                       usuarioEntity.getEmail(), usuarioEntity.getEdad())).orElseThrow(() -> new UsuarioNoExistenteException(id));
     }
 
     // Método para buscar usuarios por nombre y rango de edad. Si alguno de los parámetros es null, no se aplicará el filtro.
     // El orden de los usuarios será por ID.
     public List<Usuario> buscarUsuarios(String nombre, Integer edadMin, Integer edadMax) {
-        return usuarios.stream()
-                .filter(usuario -> nombre == null || usuario.getNombre().toUpperCase().contains(nombre.toUpperCase()))
-                .filter(usuario -> edadMin == null || usuario.getEdad() >= edadMin)
-                .filter(usuario -> edadMax == null || usuario.getEdad() <= edadMax)
-                .sorted(Comparator.comparing(Usuario::getId))
-                .toList();
+        List<UsuarioEntity> entidades;
+        if (nombre != null && edadMin != null && edadMax != null) {
+            entidades = repository.findByNombreContainingIgnoreCaseAndEdadGreaterThanEqualAndEdadLessThanEqual(nombre, edadMin, edadMax);
+        } else if (nombre != null) {
+            entidades = repository.findByNombreContainingIgnoreCase(nombre);
+        } else if (edadMin != null && edadMax != null) {
+            entidades = repository.findByEdadGreaterThanEqualAndEdadLessThanEqual(edadMin, edadMax);
+        } else {
+            entidades = repository.findAll();
+        }
+
+        return entidades.stream().map(usuarioEntity -> new Usuario(usuarioEntity.getId(), usuarioEntity.getNombre(),
+                                                                  usuarioEntity.getEmail(), usuarioEntity.getEdad())).collect(Collectors.toList());
+//        return usuarios.stream()
+//                .filter(usuario -> nombre == null || usuario.getNombre().toUpperCase().contains(nombre.toUpperCase()))
+//                .filter(usuario -> edadMin == null || usuario.getEdad() >= edadMin)
+//                .filter(usuario -> edadMax == null || usuario.getEdad() <= edadMax)
+//                .sorted(Comparator.comparing(Usuario::getId))
+//                .toList();
     }
 
     // Método para buscar usuarios por nombre y rango de edad. Si alguno de los parámetros es null, no se aplicará el filtro.
     // El orden de los usuarios será el especificado en el parámetro orden.
     public List<Usuario> buscarUsuarios(String nombre, Integer edadMin, Integer edadMax, OrdenUsuario orden) {
-        return usuarios.stream()
-                .filter(usuario -> nombre == null || usuario.getNombre().toUpperCase().contains(nombre.toUpperCase()))
-                .filter(usuario -> edadMin == null || usuario.getEdad() >= edadMin)
-                .filter(usuario -> edadMax == null || usuario.getEdad() <= edadMax)
+        List<UsuarioEntity> entidades;
+        if (nombre != null && edadMin != null && edadMax != null) {
+            entidades = repository.findByNombreContainingIgnoreCaseAndEdadGreaterThanEqualAndEdadLessThanEqual(nombre, edadMin, edadMax);
+        } else if (nombre != null) {
+            entidades = repository.findByNombreContainingIgnoreCase(nombre);
+        } else if (edadMin != null && edadMax != null) {
+            entidades = repository.findByEdadGreaterThanEqualAndEdadLessThanEqual(edadMin, edadMax);
+        } else {
+            entidades = repository.findAll();
+        }
+
+        return entidades.stream().map(
+                usuarioEntity -> new Usuario(usuarioEntity.getId(), usuarioEntity.getNombre(), usuarioEntity.getEmail(), usuarioEntity.getEdad()))
                 .sorted(orden.getComparator())
-                .toList();
+                .collect(Collectors.toList());
     }
 
     // Método para crear un nuevo usuario.
