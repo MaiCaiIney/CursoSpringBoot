@@ -1,9 +1,9 @@
 package com.utn.springboot.billeteravirtual.entity;
 
+import com.utn.springboot.billeteravirtual.entity.direccion.DireccionEntity;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Entity
 @Table(name = "usuarios")
@@ -27,19 +27,14 @@ public class UsuarioEntity {
     private EstadoUsuario estado;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "fecha_registro", nullable = false)
+    @Column(insertable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime fechaRegistro;
 
-    public UsuarioEntity() {
-    }
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "direccion_id", referencedColumnName = "id")
+    private DireccionEntity direccion;
 
-    public UsuarioEntity(Long id, String nombre, String email, Integer edad, EstadoUsuario estado, LocalDateTime fechaRegistro) {
-        this.id = id;
-        this.nombre = nombre;
-        this.email = email;
-        this.edad = edad;
-        this.estado = estado;
-        this.fechaRegistro = fechaRegistro;
+    public UsuarioEntity() {
     }
 
     public UsuarioEntity(String nombre, String email, Integer edad) {
@@ -53,9 +48,6 @@ public class UsuarioEntity {
         if (estado == null) {
             this.estado = EstadoUsuario.ACTIVO;
         }
-        if (fechaRegistro == null) {
-            this.fechaRegistro = LocalDateTime.now();
-        }
     }
 
     public Long getId() {
@@ -66,12 +58,24 @@ public class UsuarioEntity {
         return nombre;
     }
 
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
     public String getEmail() {
         return email;
     }
 
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     public Integer getEdad() {
         return edad;
+    }
+
+    public void setEdad(Integer edad) {
+        this.edad = edad;
     }
 
     public EstadoUsuario getEstado() {
@@ -80,5 +84,13 @@ public class UsuarioEntity {
 
     public LocalDateTime getFechaRegistro() {
         return fechaRegistro;
+    }
+
+    public DireccionEntity getDireccion() {
+        return direccion;
+    }
+
+    public void setDireccion(DireccionEntity direccion) {
+        this.direccion = direccion;
     }
 }

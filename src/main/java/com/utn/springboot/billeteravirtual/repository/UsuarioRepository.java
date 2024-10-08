@@ -9,7 +9,8 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface UsuarioRepository extends JpaRepository<UsuarioEntity, Long> {
+public interface UsuarioRepository extends JpaRepository<UsuarioEntity, Long>, UsuarioRepositoryCustom {
+
     // Método para encontrar usuarios por nombre, ignorando mayúsculas o minúsculas
     List<UsuarioEntity> findByNombreContainingIgnoreCase(String nombre);
 
@@ -17,10 +18,23 @@ public interface UsuarioRepository extends JpaRepository<UsuarioEntity, Long> {
     List<UsuarioEntity> findByEdadGreaterThanEqualAndEdadLessThanEqual(Integer edadMin, Integer edadMax);
 
     // Método para encontrar usuarios por nombre y dentro de un rango de edad
-    List<UsuarioEntity> findByNombreContainingIgnoreCaseAndEdadGreaterThanEqualAndEdadLessThanEqual(String nombre, Integer edadMin, Integer edadMax);
+    List<UsuarioEntity> findByNombreContainingIgnoreCaseAndEdadGreaterThanEqualAndEdadLessThanEqual(String nombre, Integer edadMin,
+                                                                                                    Integer edadMax);
 
-    @Query("SELECT u FROM UsuarioEntity u WHERE (:nombre IS NULL OR LOWER(u.nombre) LIKE LOWER(CONCAT('%', :nombre, '%'))) " +
+    @Query("SELECT u FROM UsuarioEntity u WHERE " +
+            "(:nombre IS NULL OR LOWER(u.nombre) LIKE LOWER(CONCAT('%', :nombre, '%'))) " +
             "AND (:edadMin IS NULL OR u.edad >= :edadMin) " +
             "AND (:edadMax IS NULL OR u.edad <= :edadMax)")
-    List<UsuarioEntity> buscarUsuariosConFiltros(@Param("nombre") String nombre, @Param("edadMin") Integer edadMin, @Param("edadMax") Integer edadMax);
+    List<UsuarioEntity> buscarUsuariosConFiltros(@Param("nombre") String nombre,
+                                                 @Param("edadMin") Integer edadMin,
+                                                 @Param("edadMax") Integer edadMax);
+
+    @Query(value = "SELECT * FROM usuarios u WHERE " +
+            "(:nombre IS NULL OR LOWER(u.nombre_completo) LIKE LOWER(CONCAT('%', :nombre, '%'))) " +
+            "AND (:edadMin IS NULL OR u.edad >= :edadMin) " +
+            "AND (:edadMax IS NULL OR u.edad <= :edadMax)",
+            nativeQuery = true)
+    List<UsuarioEntity> buscarUsuariosConFiltrosNativo(@Param("nombre") String nombre,
+                                                       @Param("edadMin") Integer edadMin,
+                                                       @Param("edadMax") Integer edadMax);
 }

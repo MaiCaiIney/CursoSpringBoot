@@ -11,6 +11,7 @@ public class Usuario {
     private String nombre;
     private String email;
     private int edad;
+    private String domicilio;
 
     public Usuario(String nombre, String email, int edad) {
         this.nombre = nombre;
@@ -57,6 +58,14 @@ public class Usuario {
 
     public void setEdad(Integer edad) {
         this.edad = edad;
+    }
+
+    public String getDomicilio() {
+        return domicilio;
+    }
+
+    public void setDomicilio(String domicilio) {
+        this.domicilio = domicilio;
     }
 
     public List<Cuenta> getCuentas() {

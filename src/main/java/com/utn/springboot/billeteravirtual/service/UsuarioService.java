@@ -2,6 +2,7 @@ package com.utn.springboot.billeteravirtual.service;
 
 import com.utn.springboot.billeteravirtual.controller.OrdenUsuario;
 import com.utn.springboot.billeteravirtual.entity.UsuarioEntity;
+import com.utn.springboot.billeteravirtual.entity.direccion.DireccionEntity;
 import com.utn.springboot.billeteravirtual.exception.UsuarioNoExistenteException;
 import com.utn.springboot.billeteravirtual.model.Usuario;
 import com.utn.springboot.billeteravirtual.repository.UsuarioRepository;
@@ -12,8 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,8 +20,6 @@ import java.util.stream.Collectors;
 // La anotación @Service indica que esta clase es un servicio. En Spring, los servicios son clases que contienen la lógica de negocio.
 @Service
 public class UsuarioService {
-    private final List<Usuario> usuarios = new ArrayList<>();
-
     private final UsuarioRepository repository;
     private final Utilidades utilidades;
     private final Log log;
@@ -32,66 +29,36 @@ public class UsuarioService {
         this.repository = repository;
         this.utilidades = utilidades;
         this.log = logService;
-        usuarios.add(new Usuario(1L, "Juan Perez", "juan@example.com", 41));
-        usuarios.add(new Usuario(2L, "Ana Garcia", "ana@example.com", 34));
-        usuarios.add(new Usuario(3L, "Maria Romero", "maria@example.com", 27));
-        usuarios.add(new Usuario(4L, "Roberto Aguirre", "roberto@example.com", 60));
-        usuarios.add(new Usuario(5L, "Jose Ortiz", "jose@example.com", 23));
-        usuarios.add(new Usuario(6L, "Patricia Barreto", "maria@example.com", 27));
-        usuarios.add(new Usuario(7L, "Juan Pablo Villa", "jpv@example.com", 44));
     }
 
     // Método para obtener todos los usuarios
     public List<Usuario> obtenerTodos() {
-        return repository.findAll().stream().map(usuarioEntity -> new Usuario(usuarioEntity.getId(), usuarioEntity.getNombre(),
-                                                                       usuarioEntity.getEmail(), usuarioEntity.getEdad())).collect(Collectors.toList());
+        return repository.findAll().stream().map(this::convertirEntityAUsuario).collect(Collectors.toList());
     }
 
     public Usuario buscarUsuario(Long id) throws UsuarioNoExistenteException {
-        return repository.findById(id).map(usuarioEntity -> new Usuario(usuarioEntity.getId(), usuarioEntity.getNombre(),
-                                                                       usuarioEntity.getEmail(), usuarioEntity.getEdad())).orElseThrow(() -> new UsuarioNoExistenteException(id));
-    }
-
-    // Método para buscar usuarios por nombre y rango de edad. Si alguno de los parámetros es null, no se aplicará el filtro.
-    // El orden de los usuarios será por ID.
-    public List<Usuario> buscarUsuarios(String nombre, Integer edadMin, Integer edadMax) {
-        List<UsuarioEntity> entidades;
-        if (nombre != null && edadMin != null && edadMax != null) {
-            entidades = repository.findByNombreContainingIgnoreCaseAndEdadGreaterThanEqualAndEdadLessThanEqual(nombre, edadMin, edadMax);
-        } else if (nombre != null) {
-            entidades = repository.findByNombreContainingIgnoreCase(nombre);
-        } else if (edadMin != null && edadMax != null) {
-            entidades = repository.findByEdadGreaterThanEqualAndEdadLessThanEqual(edadMin, edadMax);
-        } else {
-            entidades = repository.findAll();
-        }
-
-        return entidades.stream().map(usuarioEntity -> new Usuario(usuarioEntity.getId(), usuarioEntity.getNombre(),
-                                                                  usuarioEntity.getEmail(), usuarioEntity.getEdad())).collect(Collectors.toList());
-//        return usuarios.stream()
-//                .filter(usuario -> nombre == null || usuario.getNombre().toUpperCase().contains(nombre.toUpperCase()))
-//                .filter(usuario -> edadMin == null || usuario.getEdad() >= edadMin)
-//                .filter(usuario -> edadMax == null || usuario.getEdad() <= edadMax)
-//                .sorted(Comparator.comparing(Usuario::getId))
-//                .toList();
+        return repository.findById(id).map(this::convertirEntityAUsuario).orElseThrow(() -> new UsuarioNoExistenteException(id));
     }
 
     // Método para buscar usuarios por nombre y rango de edad. Si alguno de los parámetros es null, no se aplicará el filtro.
     // El orden de los usuarios será el especificado en el parámetro orden.
     public List<Usuario> buscarUsuarios(String nombre, Integer edadMin, Integer edadMax, OrdenUsuario orden) {
         List<UsuarioEntity> entidades;
-        if (nombre != null && edadMin != null && edadMax != null) {
-            entidades = repository.findByNombreContainingIgnoreCaseAndEdadGreaterThanEqualAndEdadLessThanEqual(nombre, edadMin, edadMax);
-        } else if (nombre != null) {
-            entidades = repository.findByNombreContainingIgnoreCase(nombre);
-        } else if (edadMin != null && edadMax != null) {
-            entidades = repository.findByEdadGreaterThanEqualAndEdadLessThanEqual(edadMin, edadMax);
-        } else {
-            entidades = repository.findAll();
-        }
+//        if (nombre != null && edadMin != null && edadMax != null) {
+//            entidades = repository.findByNombreContainingIgnoreCaseAndEdadGreaterThanEqualAndEdadLessThanEqual(nombre, edadMin, edadMax);
+//        } else if (nombre != null) {
+//            entidades = repository.findByNombreContainingIgnoreCase(nombre);
+//        } else if (edadMin != null && edadMax != null) {
+//            entidades = repository.findByEdadGreaterThanEqualAndEdadLessThanEqual(edadMin, edadMax);
+//        } else {
+//            entidades = repository.findAll();
+//        }
 
-        return entidades.stream().map(
-                usuarioEntity -> new Usuario(usuarioEntity.getId(), usuarioEntity.getNombre(), usuarioEntity.getEmail(), usuarioEntity.getEdad()))
+//        entidades = repository.buscarUsuariosConFiltros(nombre, edadMin, edadMax);
+//        entidades = repository.buscarUsuariosConFiltrosNativo(nombre, edadMin, edadMax);
+        entidades = repository.buscarUsuariosConFiltrosAPICriteria(nombre, edadMin, edadMax);
+
+        return entidades.stream().map(this::convertirEntityAUsuario)
                 .sorted(orden.getComparator())
                 .collect(Collectors.toList());
     }
@@ -102,13 +69,13 @@ public class UsuarioService {
     // El email del usuario será formateado a minúsculas.
     // El método devolverá el usuario creado.
     public Usuario crearUsuario(Usuario usuario) {
-        usuario.setId((long) (usuarios.size() + 1)); // Asignar ID al usuario nuevo
-        String nombre = utilidades.formatearTexto(usuario.getNombre());
-        usuario.setNombre(nombre);
-        usuario.setEmail(usuario.getEmail().toLowerCase());
-        usuarios.add(usuario);
-        log.registrarAccion(CodigoLog.USUARIO_CREADO, usuario);
-        return usuario;
+        UsuarioEntity entity = new UsuarioEntity();
+        entity.setNombre(utilidades.formatearTexto(usuario.getNombre()));
+        entity.setEmail(usuario.getEmail().toLowerCase());
+        entity.setEdad(usuario.getEdad());
+        entity = repository.save(entity);
+        log.registrarAccion(CodigoLog.USUARIO_CREADO, entity);
+        return convertirEntityAUsuario(entity);
     }
 
     // Método para actualizar parcialmente un usuario existente. Si el usuario no existe, se lanzará una excepción
@@ -118,26 +85,40 @@ public class UsuarioService {
     // El email del usuario será formateado a minúsculas.
     // El método devolverá el usuario actualizado.
     public Usuario actualizarUsuarioParcial(Long id, Usuario usuarioActualizado) throws UsuarioNoExistenteException {
-        Usuario usuarioRetorno = usuarios.stream().filter(usuario -> usuario.getId().equals(id)).peek(usuario -> {
-            if (usuarioActualizado.getNombre() != null) {
-                usuario.setNombre(utilidades.formatearTexto(usuarioActualizado.getNombre()));
-            }
-            if (usuarioActualizado.getEmail() != null) {
-                usuario.setEmail(usuarioActualizado.getEmail().toLowerCase());
-            }
-            if (usuarioActualizado.getEdad() != null) {
-                usuario.setEdad(usuarioActualizado.getEdad());
-            }
-        }).findFirst().orElseThrow(() -> new UsuarioNoExistenteException(id));
+        UsuarioEntity entity = repository.findById(id)
+                .orElseThrow(() -> new UsuarioNoExistenteException(id));
 
-        log.registrarAccion(CodigoLog.USUARIO_ACTUALIZADO, usuarioRetorno);
-        return usuarioRetorno;
+        if (usuarioActualizado.getNombre() != null) {
+            entity.setNombre(utilidades.formatearTexto(usuarioActualizado.getNombre()));
+        }
+        if (usuarioActualizado.getEmail() != null) {
+            entity.setEmail(usuarioActualizado.getEmail().toLowerCase());
+        }
+        if (usuarioActualizado.getEdad() != null) {
+            entity.setEdad(usuarioActualizado.getEdad());
+        }
+
+        entity = repository.save(entity);
+        log.registrarAccion(CodigoLog.USUARIO_ACTUALIZADO, entity);
+        return convertirEntityAUsuario(entity);
     }
 
     // Método para eliminar un usuario por ID. Devuelve true si el usuario fue eliminado, false en caso contrario.
     public boolean eliminarUsuario(Long id) {
-        boolean resultado = usuarios.removeIf(usuario -> usuario.getId().equals(id));
-        if (resultado) log.registrarAccion(CodigoLog.USUARIO_ELIMINADO, id);
-        return resultado;
+        boolean existe = repository.existsById(id);
+        repository.deleteById(id);
+        if (existe) log.registrarAccion(CodigoLog.USUARIO_ELIMINADO, id);
+        return existe;
+    }
+
+    private Usuario convertirEntityAUsuario(UsuarioEntity usuarioEntity) {
+        Usuario usuario = new Usuario(usuarioEntity.getId(), usuarioEntity.getNombre(), usuarioEntity.getEmail(), usuarioEntity.getEdad());
+        DireccionEntity direccion = usuarioEntity.getDireccion();
+        if (direccion != null) {
+            String domicilio = "%s %s %s, %s".formatted(direccion.getCalle(), direccion.getNumero(), direccion.getOtro(),
+                                                        direccion.getLocalidad());
+            usuario.setDomicilio(domicilio);
+        }
+        return usuario;
     }
 }
