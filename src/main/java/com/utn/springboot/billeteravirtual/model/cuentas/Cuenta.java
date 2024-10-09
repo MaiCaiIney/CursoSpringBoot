@@ -1,26 +1,26 @@
 package com.utn.springboot.billeteravirtual.model.cuentas;
 
 import com.utn.springboot.billeteravirtual.model.Usuario;
-import com.utn.springboot.billeteravirtual.model.cuentas.movimientos.Movimiento;
+import com.utn.springboot.billeteravirtual.types.TipoCuenta;
+import com.utn.springboot.billeteravirtual.types.TipoMoneda;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.math.BigDecimal;
 
 public class Cuenta implements Comparable<Cuenta> {
-    private final List<Movimiento> movimientos;
-    private Long id;
-    private Double balance;
-    private TipoCuenta tipoCuenta;
-    private TipoMoneda tipoMoneda;
-    private Usuario usuario;
+    private final Long id;
+    private final TipoCuenta tipoCuenta;
+    private final String cbu;
+    private final String alias;
+    private final TipoMoneda tipoMoneda;
+    private final BigDecimal balance;
 
     private Cuenta(CuentaBuilder builder) {
         this.id = builder.id;
-        this.balance = builder.balance;
         this.tipoCuenta = builder.tipoCuenta;
+        this.cbu = builder.cbu;
+        this.alias = builder.alias;
         this.tipoMoneda = builder.tipoMoneda;
-        this.usuario = builder.usuario;
-        this.movimientos = builder.movimientos;
+        this.balance = builder.balance;
     }
 
     @Override
@@ -28,53 +28,20 @@ public class Cuenta implements Comparable<Cuenta> {
         return this.id.compareTo(o.id);
     }
 
-    // Getters y Setters
     public Long getId() {
         return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Double getBalance() {
-        return balance;
-    }
-
-    public void setBalance(Double balance) {
-        this.balance = balance;
     }
 
     public TipoCuenta getTipoCuenta() {
         return tipoCuenta;
     }
 
-    public void setTipoCuenta(TipoCuenta tipoCuenta) {
-        this.tipoCuenta = tipoCuenta;
-    }
-
     public TipoMoneda getTipoMoneda() {
         return tipoMoneda;
     }
 
-    public void setTipoMoneda(TipoMoneda tipoMoneda) {
-        this.tipoMoneda = tipoMoneda;
-    }
-
-    public Usuario getUsuario() {
-        return usuario;
-    }
-
-    public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
-    }
-
-    public List<Movimiento> getMovimientos() {
-        return movimientos;
-    }
-
-    public void agregarMovimiento(Movimiento movimiento) {
-        this.movimientos.add(movimiento);
+    public BigDecimal getBalance() {
+        return balance;
     }
 
     @Override
@@ -84,20 +51,19 @@ public class Cuenta implements Comparable<Cuenta> {
                     "id": %d,
                     "balance": %.2f,
                     "tipoCuenta": "%s",
-                    "tipoMoneda": "%s",
-                    "usuario": %s,
-                    "movimientos": %s
+                    "tipoMoneda": "%s"
                 }
-                """.formatted(id, balance, tipoCuenta, tipoMoneda, usuario, movimientos);
+                """.formatted(id, balance, tipoCuenta, tipoMoneda);
     }
 
     // El patrón Builder nos permite crear instancias de la clase Cuenta con una sintaxis más clara y legible.
     // En lugar de tener un constructor con muchos parámetros, podemos usar un objeto Builder para ir configurando los atributos de la
     // clase.
     public static class CuentaBuilder {
-        private final List<Movimiento> movimientos = new ArrayList<>();
         private Long id;
-        private Double balance = 0.0;
+        private String cbu;
+        private String alias;
+        private BigDecimal balance = BigDecimal.ZERO;
         private TipoCuenta tipoCuenta;
         private TipoMoneda tipoMoneda;
         private Usuario usuario;
@@ -110,7 +76,17 @@ public class Cuenta implements Comparable<Cuenta> {
             return this;
         }
 
-        public CuentaBuilder balance(Double balance) {
+        public CuentaBuilder cbu(String cbu) {
+            this.cbu = cbu;
+            return this;
+        }
+
+        public CuentaBuilder alias(String alias) {
+            this.alias = alias;
+            return this;
+        }
+
+        public CuentaBuilder balance(BigDecimal balance) {
             this.balance = balance;
             return this;
         }

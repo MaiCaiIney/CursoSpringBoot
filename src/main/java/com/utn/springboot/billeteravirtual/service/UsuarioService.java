@@ -1,8 +1,8 @@
 package com.utn.springboot.billeteravirtual.service;
 
 import com.utn.springboot.billeteravirtual.controller.OrdenUsuario;
+import com.utn.springboot.billeteravirtual.entity.DireccionEntity;
 import com.utn.springboot.billeteravirtual.entity.UsuarioEntity;
-import com.utn.springboot.billeteravirtual.entity.direccion.DireccionEntity;
 import com.utn.springboot.billeteravirtual.exception.UsuarioNoExistenteException;
 import com.utn.springboot.billeteravirtual.model.Usuario;
 import com.utn.springboot.billeteravirtual.repository.UsuarioRepository;

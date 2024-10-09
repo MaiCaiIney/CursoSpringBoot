@@ -1,9 +1,10 @@
 package com.utn.springboot.billeteravirtual.entity;
 
-import com.utn.springboot.billeteravirtual.entity.direccion.DireccionEntity;
+import com.utn.springboot.billeteravirtual.types.EstadoUsuario;
 import jakarta.persistence.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Table(name = "usuarios")
@@ -26,13 +27,19 @@ public class UsuarioEntity {
     @Column(name = "estado_usuario")
     private EstadoUsuario estado;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(insertable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private LocalDateTime fechaRegistro;
+    @Temporal(TemporalType.DATE)
+    @Column(insertable = false, updatable = false, columnDefinition = "DATE DEFAULT CURRENT_DATE")
+    private LocalDate fechaRegistro;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "direccion_id", referencedColumnName = "id")
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "direccion_id", referencedColumnName = "id", unique = true)
     private DireccionEntity direccion;
+
+    @OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY)
+    private List<CuentaEntity> cuentas;
+
+    @ManyToMany(mappedBy = "usuarios", fetch = FetchType.LAZY)
+    private List<NotificacionEntity> notificaciones;
 
     public UsuarioEntity() {
     }
@@ -82,7 +89,7 @@ public class UsuarioEntity {
         return estado;
     }
 
-    public LocalDateTime getFechaRegistro() {
+    public LocalDate getFechaRegistro() {
         return fechaRegistro;
     }
 

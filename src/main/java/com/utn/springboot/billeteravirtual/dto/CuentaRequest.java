@@ -1,9 +1,11 @@
 package com.utn.springboot.billeteravirtual.dto;
 
-import com.utn.springboot.billeteravirtual.model.cuentas.TipoCuenta;
-import com.utn.springboot.billeteravirtual.model.cuentas.TipoMoneda;
+import com.utn.springboot.billeteravirtual.types.TipoCuenta;
+import com.utn.springboot.billeteravirtual.types.TipoMoneda;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
+
+import java.math.BigDecimal;
 
 @Schema(description = "Payload para la creación de una cuenta")
 public class CuentaRequest {
@@ -17,7 +19,7 @@ public class CuentaRequest {
 
     @Schema(description = "Balance actual de la cuenta", example = "1000", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull
-    private Double balance;
+    private BigDecimal balance;
 
     @Schema(description = "Tipo de moneda", example = "ARS", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull
@@ -31,7 +33,7 @@ public class CuentaRequest {
         return idUsuario;
     }
 
-    public Double getBalance() {
+    public BigDecimal getBalance() {
         return balance;
     }
 

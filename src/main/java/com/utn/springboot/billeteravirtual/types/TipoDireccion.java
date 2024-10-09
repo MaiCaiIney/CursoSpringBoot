@@ -1,4 +1,4 @@
-package com.utn.springboot.billeteravirtual.entity.direccion;
+package com.utn.springboot.billeteravirtual.types;
 
 public enum TipoDireccion {
     CASA,

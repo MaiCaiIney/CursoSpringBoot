@@ -1,7 +1,10 @@
 package com.utn.springboot.billeteravirtual.mapper;
 
 import com.utn.springboot.billeteravirtual.dto.CuentaRequest;
+import com.utn.springboot.billeteravirtual.entity.CuentaEntity;
+import com.utn.springboot.billeteravirtual.entity.TransaccionEntity;
 import com.utn.springboot.billeteravirtual.model.cuentas.Cuenta;
+import com.utn.springboot.billeteravirtual.model.cuentas.Transaccion;
 import org.springframework.stereotype.Component;
 
 // Un mapper es una clase que se utiliza para convertir un objeto de un tipo en otro.
@@ -17,5 +20,26 @@ public class CuentaMapper {
                 .tipoMoneda(dto.getTipoMoneda())
                 .balance(dto.getBalance());
         return cuenta.build();
+    }
+
+    public Cuenta toModel(CuentaEntity entity) {
+        Cuenta.CuentaBuilder cuenta = new Cuenta.CuentaBuilder()
+                .id(entity.getId())
+                .cbu(entity.getCbu())
+                .alias(entity.getAlias())
+                .tipoCuenta(entity.getTipoCuenta())
+                .tipoMoneda(entity.getTipoMoneda())
+                .balance(entity.getBalance());
+        return cuenta.build();
+    }
+
+    public Transaccion toModel(TransaccionEntity entity) {
+        return new Transaccion(
+                entity.getId(),
+                entity.getTipoTransaccion(),
+                entity.getCuenta().getTipoMoneda(),
+                entity.getMonto(),
+                entity.getFechaTransaccion()
+        );
     }
 }

@@ -1,6 +1,6 @@
-package com.utn.springboot.billeteravirtual.entity.direccion;
+package com.utn.springboot.billeteravirtual.entity;
 
-import com.utn.springboot.billeteravirtual.entity.UsuarioEntity;
+import com.utn.springboot.billeteravirtual.types.TipoDireccion;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 

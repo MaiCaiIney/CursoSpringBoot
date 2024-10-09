@@ -1,4 +1,4 @@
-package com.utn.springboot.billeteravirtual.model.cuentas;
+package com.utn.springboot.billeteravirtual.types;
 
 public enum TipoMoneda {
     ARS("$"), USD("U$D");

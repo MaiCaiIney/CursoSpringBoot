@@ -1,13 +1,12 @@
 package com.utn.springboot.billeteravirtual.controller;
 
 import com.utn.springboot.billeteravirtual.dto.CuentaRequest;
-import com.utn.springboot.billeteravirtual.exception.CuentaNoExistenteException;
 import com.utn.springboot.billeteravirtual.mapper.CuentaMapper;
-import com.utn.springboot.billeteravirtual.model.Usuario;
 import com.utn.springboot.billeteravirtual.model.cuentas.Cuenta;
-import com.utn.springboot.billeteravirtual.model.cuentas.TipoMoneda;
+import com.utn.springboot.billeteravirtual.model.cuentas.Transaccion;
 import com.utn.springboot.billeteravirtual.service.CuentaService;
 import com.utn.springboot.billeteravirtual.service.UsuarioService;
+import com.utn.springboot.billeteravirtual.types.TipoMoneda;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -17,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -57,9 +57,7 @@ public class CuentaController {
             @Parameter(description = "Información obligatoria para crear una cuenta")
             @Valid @RequestBody CuentaRequest request) {
         Cuenta cuenta = cuentaMapper.toModel(request);
-        Usuario usuario = usuarioService.buscarUsuario(request.getIdUsuario());
-        cuenta.setUsuario(usuario);  // Relacionar la cuenta con el usuario
-        return cuentaService.crearCuenta(cuenta);
+        return cuentaService.crearCuenta(cuenta, request.getIdUsuario());
     }
 
     @Operation(summary = "Obtener una cuenta por ID")
@@ -80,11 +78,11 @@ public class CuentaController {
             @ApiResponse(responseCode = "400", description = "Datos del depósito inválidos")
     })
     @PostMapping("/{id}/depositar")
-    public Cuenta depositar(
+    public Transaccion depositar(
             @Parameter(description = "Identificador único de la cuenta destino del depósito", example = "1")
             @PathVariable Long id,
             @Parameter(description = "Monto a depositar", example = "100.0")
-            @RequestParam Double monto,
+            @RequestParam BigDecimal monto,
             @Parameter(description = "Tipo de moneda del depósito", example = "ARS")
             @RequestParam TipoMoneda moneda) {
         return cuentaService.depositar(id, monto, moneda);
@@ -92,11 +90,11 @@ public class CuentaController {
 
     @Operation(summary = "Retirar dinero de una cuenta")
     @PostMapping("/{id}/retirar")
-    public Cuenta retirar(
+    public Transaccion retirar(
             @Parameter(description = "Identificador único de la cuenta origen del retiro", example = "1")
             @PathVariable Long id,
             @Parameter(description = "Monto a retirar", example = "50.0")
-            @RequestParam Double monto,
+            @RequestParam BigDecimal monto,
             @Parameter(description = "Tipo de moneda del retiro", example = "ARS")
             @RequestParam TipoMoneda moneda) {
         return cuentaService.retirar(id, monto, moneda);
@@ -104,13 +102,13 @@ public class CuentaController {
 
     @Operation(summary = "Transferir dinero entre cuentas")
     @PostMapping("/transferir")
-    public List<Cuenta> transferir(
+    public Transaccion transferir(
             @Parameter(description = "Identificador único de la cuenta origen de la transferencia", example = "1")
             @RequestParam Long idOrigen,
             @Parameter(description = "Identificador único de la cuenta destino de la transferencia", example = "2")
             @RequestParam Long idDestino,
             @Parameter(description = "Monto a transferir", example = "75.0")
-            @RequestParam Double monto,
+            @RequestParam BigDecimal monto,
             @Parameter(description = "Tipo de moneda de la transferencia", example = "ARS")
             @RequestParam TipoMoneda moneda) {
         return cuentaService.transferir(idOrigen, idDestino, monto, moneda);
@@ -122,9 +120,6 @@ public class CuentaController {
     public void eliminarCuenta(
             @Parameter(description = "Identificador único de la cuenta a eliminar", example = "1")
             @PathVariable Long id) {
-        boolean resultado = cuentaService.eliminarCuenta(id);
-        if (!resultado) {
-            throw new CuentaNoExistenteException(id);
-        }
+        cuentaService.eliminarCuenta(id);
     }
 }
