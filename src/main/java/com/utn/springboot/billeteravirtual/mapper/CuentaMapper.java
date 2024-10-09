@@ -2,7 +2,7 @@ package com.utn.springboot.billeteravirtual.mapper;
 
 import com.utn.springboot.billeteravirtual.dto.CuentaRequest;
 import com.utn.springboot.billeteravirtual.entity.CuentaEntity;
-import com.utn.springboot.billeteravirtual.entity.TransaccionEntity;
+import com.utn.springboot.billeteravirtual.entity.transacciones.TransaccionEntity;
 import com.utn.springboot.billeteravirtual.model.cuentas.Cuenta;
 import com.utn.springboot.billeteravirtual.model.cuentas.Transaccion;
 import org.springframework.stereotype.Component;

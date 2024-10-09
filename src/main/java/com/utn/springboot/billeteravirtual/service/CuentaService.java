@@ -1,7 +1,7 @@
 package com.utn.springboot.billeteravirtual.service;
 
 import com.utn.springboot.billeteravirtual.entity.CuentaEntity;
-import com.utn.springboot.billeteravirtual.entity.TransaccionEntity;
+import com.utn.springboot.billeteravirtual.entity.transacciones.TransaccionEntity;
 import com.utn.springboot.billeteravirtual.entity.UsuarioEntity;
 import com.utn.springboot.billeteravirtual.exception.*;
 import com.utn.springboot.billeteravirtual.mapper.CuentaMapper;
@@ -150,6 +150,11 @@ public class CuentaService {
     public void eliminarCuenta(Long id) throws CuentaNoExistenteException {
         CuentaEntity cuentaEntity = cuentaRepository.findById(id).orElseThrow(() -> new CuentaNoExistenteException(id));
         cuentaRepository.delete(cuentaEntity);
+    }
+
+    public List<Transaccion> buscarTransacciones(Long id) throws CuentaNoExistenteException {
+        CuentaEntity cuentaEntity = cuentaRepository.findById(id).orElseThrow(() -> new CuentaNoExistenteException(id));
+        return cuentaEntity.getTransacciones().stream().map(cuentaMapper::toModel).toList();
     }
 
     private boolean esBalanceInsuficiente(BigDecimal saldoDisponible, BigDecimal montoTransaccion) {

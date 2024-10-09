@@ -1,7 +1,12 @@
 package com.utn.springboot.billeteravirtual.initializer;
 
 import com.utn.springboot.billeteravirtual.entity.*;
+import com.utn.springboot.billeteravirtual.entity.transacciones.PagoServicioEntity;
+import com.utn.springboot.billeteravirtual.entity.transacciones.ServicioEntity;
+import com.utn.springboot.billeteravirtual.entity.transacciones.TransaccionEntity;
 import com.utn.springboot.billeteravirtual.repository.*;
+import com.utn.springboot.billeteravirtual.repository.PagoServicioRepository;
+import com.utn.springboot.billeteravirtual.repository.TransaccionRepository;
 import com.utn.springboot.billeteravirtual.types.TipoCuenta;
 import com.utn.springboot.billeteravirtual.types.TipoDireccion;
 import com.utn.springboot.billeteravirtual.types.TipoMoneda;
@@ -66,11 +71,11 @@ public class DataInitializer {
         cuentaRepository.save(cuenta2);
 
         TransaccionEntity deposito1 = new TransaccionEntity(TipoTransaccion.DEPOSITO,
-                                                               new BigDecimal("100000.00"),
-                                                               cuenta2);
+                                                            new BigDecimal("100000.00"),
+                                                            cuenta2);
         transaccionRepository.save(deposito1);
 
-        ServicioEntity servicio1 = new ServicioEntity("Luz", "EDEA", "");
+        ServicioEntity servicio1 = new ServicioEntity("Luz", "EDEA", "301234567800");
         servicioRepository.save(servicio1);
 
         PagoServicioEntity pagoServicioEntity1 = new PagoServicioEntity(new BigDecimal("50000.00"),

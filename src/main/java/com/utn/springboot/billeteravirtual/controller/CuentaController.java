@@ -25,15 +25,13 @@ public class CuentaController {
 
     // Estos atributos son finales y se inicializan en el constructor.
     private final CuentaService cuentaService;
-    private final UsuarioService usuarioService;
     private final CuentaMapper cuentaMapper;
 
     // El constructor recibe los servicios necesarios para el controlador.
     // La anotación @Autowired indica a Spring que debe inyectar estas dependencias al momento de crear una instancia de la clase.
     @Autowired
-    public CuentaController(CuentaService cuentaService, UsuarioService usuarioService, CuentaMapper cuentaMapper) {
+    public CuentaController(CuentaService cuentaService, CuentaMapper cuentaMapper) {
         this.cuentaService = cuentaService;
-        this.usuarioService = usuarioService;
         this.cuentaMapper = cuentaMapper;
     }
 
@@ -121,5 +119,13 @@ public class CuentaController {
             @Parameter(description = "Identificador único de la cuenta a eliminar", example = "1")
             @PathVariable Long id) {
         cuentaService.eliminarCuenta(id);
+    }
+
+    @Operation(summary = "Buscar transacciones de una cuenta")
+    @GetMapping("/{id}/transacciones")
+    public List<Transaccion> buscarTransacciones(
+            @Parameter(description = "Identificador único de la cuenta", example = "1")
+            @PathVariable Long id) {
+        return cuentaService.buscarTransacciones(id);
     }
 }

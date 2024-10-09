@@ -1,5 +1,7 @@
-package com.utn.springboot.billeteravirtual.entity;
+package com.utn.springboot.billeteravirtual.entity.transacciones;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.utn.springboot.billeteravirtual.entity.CuentaEntity;
 import com.utn.springboot.billeteravirtual.types.TipoTransaccion;
 import jakarta.persistence.*;
 
@@ -16,18 +18,20 @@ public class TransaccionEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private final TipoTransaccion tipoTransaccion;
+    private TipoTransaccion tipoTransaccion;
 
     @Column(nullable = false, precision = 10, scale = 2)
-    private final BigDecimal monto;
+    private BigDecimal monto;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "cuenta_id", nullable = false)
-    private final CuentaEntity cuenta;
+    private CuentaEntity cuenta;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(insertable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime fechaTransaccion;
+
+    public TransaccionEntity() {}
 
     public TransaccionEntity(TipoTransaccion tipoTransaccion, BigDecimal monto, CuentaEntity cuenta) {
         this.tipoTransaccion = tipoTransaccion;

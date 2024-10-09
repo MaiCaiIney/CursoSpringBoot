@@ -54,6 +54,7 @@ public class UsuarioService {
 //            entidades = repository.findAll();
 //        }
 
+//        entidades = repository.findByNombreContainingIgnoreCaseAndEdadGreaterThanEqualAndEdadLessThanEqual(nombre, edadMin, edadMax);
 //        entidades = repository.buscarUsuariosConFiltros(nombre, edadMin, edadMax);
 //        entidades = repository.buscarUsuariosConFiltrosNativo(nombre, edadMin, edadMax);
         entidades = repository.buscarUsuariosConFiltrosAPICriteria(nombre, edadMin, edadMax);

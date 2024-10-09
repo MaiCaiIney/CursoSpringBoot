@@ -29,4 +29,24 @@ public class Transaccion implements Comparable<Transaccion> {
     public int compareTo(Transaccion transaccion) {
         return this.fecha.compareTo(transaccion.fecha);
     }
+
+    public Long getId() {
+        return id;
+    }
+
+    public TipoTransaccion getTipo() {
+        return tipo;
+    }
+
+    public TipoMoneda getTipoMoneda() {
+        return tipoMoneda;
+    }
+
+    public BigDecimal getMonto() {
+        return monto;
+    }
+
+    public LocalDateTime getFecha() {
+        return fecha;
+    }
 }

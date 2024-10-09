@@ -1,4 +1,4 @@
-package com.utn.springboot.billeteravirtual.entity;
+package com.utn.springboot.billeteravirtual.entity.transacciones;
 
 import jakarta.persistence.*;
 
@@ -17,6 +17,9 @@ public class ServicioEntity {
 
     @Column(nullable = false)
     private String cuit;
+
+    public ServicioEntity() {
+    }
 
     public ServicioEntity(String nombreServicio, String empresa, String cuit) {
         this.nombreServicio = nombreServicio;
