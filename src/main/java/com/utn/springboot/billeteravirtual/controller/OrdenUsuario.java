@@ -14,4 +14,12 @@ public enum OrdenUsuario {
             case EMAIL -> Comparator.comparing(Usuario::getEmail);
         };
     }
+
+    public String getProperty() {
+        return switch (this) {
+            case ID -> "id";
+            case NOMBRE -> "nombre";
+            case EMAIL -> "email";
+        };
+    }
 }

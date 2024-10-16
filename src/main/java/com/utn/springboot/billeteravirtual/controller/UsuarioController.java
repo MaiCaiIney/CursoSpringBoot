@@ -15,6 +15,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -52,7 +56,7 @@ public class UsuarioController {
             @ApiResponse(responseCode = "400", description = "Parámetros de búsqueda inválidos")
     })
     @GetMapping
-    public List<Usuario> obtenerUsuarios(
+    public Page<Usuario> obtenerUsuarios(
             @Parameter(description = "Filtro opcional para buscar usuarios por nombre", example = "Juan")
             @RequestParam(required = false) String nombre,
             @Parameter(description = "Filtro opcional para buscar usuarios que superen una edad mínima", example = "40")
@@ -60,8 +64,11 @@ public class UsuarioController {
             @Parameter(description = "Filtro opcional para buscar usuarios que no superen una edad máxima", example = "50")
             @RequestParam(required = false) Integer edadMax,
             @Parameter(description = "Ordenar la lista de usuarios por id, nombre o email", example = "NOMBRE")
-            @RequestParam(required = false, defaultValue = "ID") OrdenUsuario orden) {
-        return usuarioService.buscarUsuarios(nombre, edadMin, edadMax, orden);
+            @RequestParam(required = false, defaultValue = "ID") OrdenUsuario orden,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(orden.getProperty()).ascending());
+        return usuarioService.buscarUsuarios(nombre, edadMin, edadMax, pageable);
     }
 
     // 2. Obtener un usuario por ID
@@ -157,5 +164,10 @@ public class UsuarioController {
             @Parameter(description = "ID del usuario para obtener sus cuentas", example = "1")
             @PathVariable Long id) {
         return cuentaService.obtenerCuentasPorUsuario(id);
+    }
+
+    @GetMapping("/cuentas")
+    public List<Usuario> obtenerTodosUsuariosConCuentas() {
+        return usuarioService.obtenerUsuariosConCuentas();
     }
 }

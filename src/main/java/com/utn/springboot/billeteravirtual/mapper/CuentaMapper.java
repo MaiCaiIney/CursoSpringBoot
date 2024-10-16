@@ -2,6 +2,7 @@ package com.utn.springboot.billeteravirtual.mapper;
 
 import com.utn.springboot.billeteravirtual.dto.CuentaRequest;
 import com.utn.springboot.billeteravirtual.entity.CuentaEntity;
+import com.utn.springboot.billeteravirtual.entity.projections.TransaccionProjection;
 import com.utn.springboot.billeteravirtual.entity.transacciones.TransaccionEntity;
 import com.utn.springboot.billeteravirtual.model.cuentas.Cuenta;
 import com.utn.springboot.billeteravirtual.model.cuentas.Transaccion;
@@ -35,11 +36,17 @@ public class CuentaMapper {
 
     public Transaccion toModel(TransaccionEntity entity) {
         return new Transaccion(
-                entity.getId(),
                 entity.getTipoTransaccion(),
-                entity.getCuenta().getTipoMoneda(),
                 entity.getMonto(),
                 entity.getFechaTransaccion()
+        );
+    }
+
+    public Transaccion toModel(TransaccionProjection projection) {
+        return new Transaccion(
+                projection.getTipoTransaccion(),
+                projection.getMonto(),
+                projection.getFechaTransaccion()
         );
     }
 }

@@ -1,6 +1,5 @@
 package com.utn.springboot.billeteravirtual.entity.transacciones;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.utn.springboot.billeteravirtual.entity.CuentaEntity;
 import com.utn.springboot.billeteravirtual.types.TipoTransaccion;
 import jakarta.persistence.*;
@@ -9,11 +8,13 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Inheritance(strategy = InheritanceType.JOINED)
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+//@DiscriminatorColumn(name = "discriminador", discriminatorType = DiscriminatorType.STRING)
+//@DiscriminatorValue("TRANSACCION")
 @Table(name = "transacciones")
 public class TransaccionEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @Enumerated(EnumType.STRING)
@@ -28,10 +29,11 @@ public class TransaccionEntity {
     private CuentaEntity cuenta;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(insertable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @Column(nullable = false, insertable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime fechaTransaccion;
 
-    public TransaccionEntity() {}
+    public TransaccionEntity() {
+    }
 
     public TransaccionEntity(TipoTransaccion tipoTransaccion, BigDecimal monto, CuentaEntity cuenta) {
         this.tipoTransaccion = tipoTransaccion;

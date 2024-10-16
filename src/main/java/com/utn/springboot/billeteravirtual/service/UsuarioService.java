@@ -1,9 +1,9 @@
 package com.utn.springboot.billeteravirtual.service;
 
-import com.utn.springboot.billeteravirtual.controller.OrdenUsuario;
 import com.utn.springboot.billeteravirtual.entity.DireccionEntity;
 import com.utn.springboot.billeteravirtual.entity.UsuarioEntity;
 import com.utn.springboot.billeteravirtual.exception.UsuarioNoExistenteException;
+import com.utn.springboot.billeteravirtual.mapper.CuentaMapper;
 import com.utn.springboot.billeteravirtual.model.Usuario;
 import com.utn.springboot.billeteravirtual.repository.UsuarioRepository;
 import com.utn.springboot.billeteravirtual.utils.Utilidades;
@@ -11,6 +11,8 @@ import com.utn.springboot.billeteravirtual.utils.log.CodigoLog;
 import com.utn.springboot.billeteravirtual.utils.log.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,6 +25,9 @@ public class UsuarioService {
     private final UsuarioRepository repository;
     private final Utilidades utilidades;
     private final Log log;
+
+    @Autowired
+    private CuentaMapper cuentaMapper;
 
     @Autowired
     public UsuarioService(UsuarioRepository repository, Utilidades utilidades, @Qualifier("consoleLog") Log logService) {
@@ -42,26 +47,25 @@ public class UsuarioService {
 
     // Método para buscar usuarios por nombre y rango de edad. Si alguno de los parámetros es null, no se aplicará el filtro.
     // El orden de los usuarios será el especificado en el parámetro orden.
-    public List<Usuario> buscarUsuarios(String nombre, Integer edadMin, Integer edadMax, OrdenUsuario orden) {
-        List<UsuarioEntity> entidades;
-//        if (nombre != null && edadMin != null && edadMax != null) {
-//            entidades = repository.findByNombreContainingIgnoreCaseAndEdadGreaterThanEqualAndEdadLessThanEqual(nombre, edadMin, edadMax);
-//        } else if (nombre != null) {
-//            entidades = repository.findByNombreContainingIgnoreCase(nombre);
-//        } else if (edadMin != null && edadMax != null) {
-//            entidades = repository.findByEdadGreaterThanEqualAndEdadLessThanEqual(edadMin, edadMax);
-//        } else {
-//            entidades = repository.findAll();
-//        }
+    public Page<Usuario> buscarUsuarios(String nombre, Integer edadMin, Integer edadMax, Pageable pageable) {
+        Page<UsuarioEntity> entidades;
+        if (nombre != null && edadMin != null && edadMax != null) {
+            entidades = repository.findByNombreContainingIgnoreCaseAndEdadGreaterThanEqualAndEdadLessThanEqual(nombre, edadMin, edadMax,
+                                                                                                               pageable);
+        } else if (nombre != null) {
+            entidades = repository.findByNombreContainingIgnoreCase(nombre, pageable);
+        } else if (edadMin != null && edadMax != null) {
+            entidades = repository.findByEdadGreaterThanEqualAndEdadLessThanEqual(edadMin, edadMax, pageable);
+        } else {
+            entidades = repository.findAll(pageable);
+        }
 
 //        entidades = repository.findByNombreContainingIgnoreCaseAndEdadGreaterThanEqualAndEdadLessThanEqual(nombre, edadMin, edadMax);
 //        entidades = repository.buscarUsuariosConFiltros(nombre, edadMin, edadMax);
 //        entidades = repository.buscarUsuariosConFiltrosNativo(nombre, edadMin, edadMax);
-        entidades = repository.buscarUsuariosConFiltrosAPICriteria(nombre, edadMin, edadMax);
+//        entidades = repository.buscarUsuariosConFiltrosAPICriteria(nombre, edadMin, edadMax);
 
-        return entidades.stream().map(this::convertirEntityAUsuario)
-                .sorted(orden.getComparator())
-                .collect(Collectors.toList());
+        return entidades.map(this::convertirEntityAUsuario);
     }
 
     // Método para crear un nuevo usuario.
@@ -110,6 +114,14 @@ public class UsuarioService {
         repository.deleteById(id);
         if (existe) log.registrarAccion(CodigoLog.USUARIO_ELIMINADO, id);
         return existe;
+    }
+
+    public List<Usuario> obtenerUsuariosConCuentas() {
+        return repository.findAllUsersAndAccounts().stream().map(entity -> {
+            Usuario model = convertirEntityAUsuario(entity);
+            entity.getCuentas().stream().map(cuentaMapper::toModel).forEach(model::agregarCuenta);
+            return model;
+        }).collect(Collectors.toList());
     }
 
     private Usuario convertirEntityAUsuario(UsuarioEntity usuarioEntity) {

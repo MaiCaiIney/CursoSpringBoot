@@ -3,12 +3,17 @@ package com.utn.springboot.billeteravirtual.entity;
 import com.utn.springboot.billeteravirtual.types.EstadoUsuario;
 import jakarta.persistence.*;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Entity
-@Table(name = "usuarios")
-public class UsuarioEntity {
+@Table(name = "usuarios", indexes = {
+        @Index(name = "idx_usuario_email", columnList = "email")
+})
+@NamedEntityGraph(
+        name = "Usuario.cuentas",
+        attributeNodes = @NamedAttributeNode("cuentas")
+)
+public class UsuarioEntity extends Auditable<String> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,11 +32,7 @@ public class UsuarioEntity {
     @Column(name = "estado_usuario")
     private EstadoUsuario estado;
 
-    @Temporal(TemporalType.DATE)
-    @Column(insertable = false, updatable = false, columnDefinition = "DATE DEFAULT CURRENT_DATE")
-    private LocalDate fechaRegistro;
-
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "direccion_id", referencedColumnName = "id", unique = true)
     private DireccionEntity direccion;
 
@@ -59,6 +60,10 @@ public class UsuarioEntity {
 
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getNombre() {
@@ -89,8 +94,8 @@ public class UsuarioEntity {
         return estado;
     }
 
-    public LocalDate getFechaRegistro() {
-        return fechaRegistro;
+    public void setEstado(EstadoUsuario estado) {
+        this.estado = estado;
     }
 
     public DireccionEntity getDireccion() {
@@ -99,5 +104,13 @@ public class UsuarioEntity {
 
     public void setDireccion(DireccionEntity direccion) {
         this.direccion = direccion;
+    }
+
+    public List<CuentaEntity> getCuentas() {
+        return cuentas;
+    }
+
+    public List<NotificacionEntity> getNotificaciones() {
+        return notificaciones;
     }
 }

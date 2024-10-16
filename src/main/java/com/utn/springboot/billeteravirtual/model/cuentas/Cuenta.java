@@ -1,6 +1,5 @@
 package com.utn.springboot.billeteravirtual.model.cuentas;
 
-import com.utn.springboot.billeteravirtual.model.Usuario;
 import com.utn.springboot.billeteravirtual.types.TipoCuenta;
 import com.utn.springboot.billeteravirtual.types.TipoMoneda;
 
@@ -36,6 +35,14 @@ public class Cuenta implements Comparable<Cuenta> {
         return tipoCuenta;
     }
 
+    public String getCbu() {
+        return cbu;
+    }
+
+    public String getAlias() {
+        return alias;
+    }
+
     public TipoMoneda getTipoMoneda() {
         return tipoMoneda;
     }
@@ -66,7 +73,6 @@ public class Cuenta implements Comparable<Cuenta> {
         private BigDecimal balance = BigDecimal.ZERO;
         private TipoCuenta tipoCuenta;
         private TipoMoneda tipoMoneda;
-        private Usuario usuario;
 
         public CuentaBuilder() {
         }
@@ -98,11 +104,6 @@ public class Cuenta implements Comparable<Cuenta> {
 
         public CuentaBuilder tipoMoneda(TipoMoneda tipoMoneda) {
             this.tipoMoneda = tipoMoneda;
-            return this;
-        }
-
-        public CuentaBuilder usuario(Usuario usuario) {
-            this.usuario = usuario;
             return this;
         }
 

@@ -1,8 +1,8 @@
 package com.utn.springboot.billeteravirtual.service;
 
 import com.utn.springboot.billeteravirtual.entity.CuentaEntity;
-import com.utn.springboot.billeteravirtual.entity.transacciones.TransaccionEntity;
 import com.utn.springboot.billeteravirtual.entity.UsuarioEntity;
+import com.utn.springboot.billeteravirtual.entity.transacciones.TransaccionEntity;
 import com.utn.springboot.billeteravirtual.exception.*;
 import com.utn.springboot.billeteravirtual.mapper.CuentaMapper;
 import com.utn.springboot.billeteravirtual.model.cuentas.Cuenta;
@@ -12,6 +12,7 @@ import com.utn.springboot.billeteravirtual.repository.TransaccionRepository;
 import com.utn.springboot.billeteravirtual.repository.UsuarioRepository;
 import com.utn.springboot.billeteravirtual.types.TipoMoneda;
 import com.utn.springboot.billeteravirtual.types.TipoTransaccion;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -66,12 +67,16 @@ public class CuentaService {
     // Si la cuenta no existe, lanzará una excepción CuentaNoExistenteException.
     // Si la moneda del depósito no coincide con la moneda de la cuenta, lanzará una excepción MonedaInvalidaException.
     // Si el depósito es exitoso, se creará una transacción de tipo DEPOSITO.
+    @Transactional
     public Transaccion depositar(Long id, BigDecimal monto, TipoMoneda moneda) throws CuentaNoExistenteException, MonedaInvalidaException {
         CuentaEntity cuentaEntity = cuentaRepository.findById(id).orElseThrow(() -> new CuentaNoExistenteException(id));
 
         if (!cuentaEntity.getTipoMoneda().equals(moneda)) {
             throw new MonedaInvalidaException(TipoOperacion.DEPOSITO);
         }
+
+        cuentaEntity.setBalance(cuentaEntity.getBalance().add(monto));
+        cuentaRepository.save(cuentaEntity);
 
         TransaccionEntity transaccionEntity = new TransaccionEntity(TipoTransaccion.DEPOSITO, monto, cuentaEntity);
         transaccionEntity = transaccionRepository.save(transaccionEntity);
@@ -84,19 +89,17 @@ public class CuentaService {
     // Si la moneda del retiro no coincide con la moneda de la cuenta, lanzará una excepción MonedaInvalidaException.
     // Si el saldo de la cuenta es insuficiente, lanzará una excepción SaldoInsuficienteException.
     // Si el retiro es exitoso, se creará una transacción de tipo RETIRO.
+    @Transactional
     public Transaccion retirar(Long id, BigDecimal monto, TipoMoneda moneda) throws CuentaNoExistenteException, MonedaInvalidaException,
             SaldoInsuficienteException {
         CuentaEntity cuentaEntity = cuentaRepository.findById(id).orElseThrow(() -> new CuentaNoExistenteException(id));
 
         if (!cuentaEntity.getTipoMoneda().equals(moneda)) {
             throw new MonedaInvalidaException(TipoOperacion.RETIRO);
-        }
-
-        if (esBalanceInsuficiente(cuentaEntity.getBalance(), monto)) {
+        } else if (esBalanceInsuficiente(cuentaEntity.getBalance(), monto)) {
             throw new SaldoInsuficienteException(id, cuentaEntity.getBalance(), moneda);
         } else {
-            BigDecimal nuevoBalance = cuentaEntity.getBalance().subtract(monto);
-            cuentaEntity.setBalance(nuevoBalance);
+            cuentaEntity.setBalance(cuentaEntity.getBalance().subtract(monto));
             cuentaRepository.save(cuentaEntity);
 
             TransaccionEntity transaccionEntity = new TransaccionEntity(TipoTransaccion.RETIRO, monto, cuentaEntity);
@@ -111,6 +114,7 @@ public class CuentaService {
     // Si la moneda de la transferencia no coincide con la moneda de alguna de las cuentas, lanzará una excepción MonedaInvalidaException.
     // Si el saldo de la cuenta origen es insuficiente, lanzará una excepción SaldoInsuficienteException.
     // Si la transferencia es exitosa, se creará una transacción de tipo TRANSFERENCIA en ambas cuentas.
+    @Transactional
     public Transaccion transferir(Long idOrigen, Long idDestino, BigDecimal monto, TipoMoneda moneda) throws CuentaNoExistenteException,
             MonedaInvalidaException,
             SaldoInsuficienteException {
@@ -120,9 +124,7 @@ public class CuentaService {
 
         if (!cuentaOrigenEntity.getTipoMoneda().equals(moneda) || !cuentaDestinoEntity.getTipoMoneda().equals(moneda)) {
             throw new MonedaInvalidaException(TipoOperacion.TRANSFERENCIA);
-        }
-
-        if (esBalanceInsuficiente(cuentaOrigenEntity.getBalance(), monto)) {
+        } else if (esBalanceInsuficiente(cuentaOrigenEntity.getBalance(), monto)) {
             throw new SaldoInsuficienteException(idOrigen, cuentaOrigenEntity.getBalance(), moneda);
         } else {
             BigDecimal nuevoBalanceOrigen = cuentaOrigenEntity.getBalance().subtract(monto);
@@ -153,8 +155,9 @@ public class CuentaService {
     }
 
     public List<Transaccion> buscarTransacciones(Long id) throws CuentaNoExistenteException {
-        CuentaEntity cuentaEntity = cuentaRepository.findById(id).orElseThrow(() -> new CuentaNoExistenteException(id));
-        return cuentaEntity.getTransacciones().stream().map(cuentaMapper::toModel).toList();
+//        CuentaEntity cuentaEntity = cuentaRepository.findById(id).orElseThrow(() -> new CuentaNoExistenteException(id));
+//        return transaccionRepository.findByCuenta(cuentaEntity).stream().map(cuentaMapper::toModel).toList();
+        return transaccionRepository.findByCuentaId(id).stream().toList();
     }
 
     private boolean esBalanceInsuficiente(BigDecimal saldoDisponible, BigDecimal montoTransaccion) {

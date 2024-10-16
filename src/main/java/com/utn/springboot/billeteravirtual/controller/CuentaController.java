@@ -5,7 +5,6 @@ import com.utn.springboot.billeteravirtual.mapper.CuentaMapper;
 import com.utn.springboot.billeteravirtual.model.cuentas.Cuenta;
 import com.utn.springboot.billeteravirtual.model.cuentas.Transaccion;
 import com.utn.springboot.billeteravirtual.service.CuentaService;
-import com.utn.springboot.billeteravirtual.service.UsuarioService;
 import com.utn.springboot.billeteravirtual.types.TipoMoneda;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
