@@ -1,6 +1,6 @@
 package com.utn.springboot.billeteravirtual.repository;
 
-import com.utn.springboot.billeteravirtual.entity.UsuarioEntity;
+import com.utn.springboot.billeteravirtual.repository.entity.UsuarioEntity;
 
 import java.util.List;
 

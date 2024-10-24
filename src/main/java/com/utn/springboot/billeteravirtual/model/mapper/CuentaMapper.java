@@ -1,11 +1,11 @@
-package com.utn.springboot.billeteravirtual.mapper;
+package com.utn.springboot.billeteravirtual.model.mapper;
 
-import com.utn.springboot.billeteravirtual.dto.CuentaRequest;
-import com.utn.springboot.billeteravirtual.entity.CuentaEntity;
-import com.utn.springboot.billeteravirtual.entity.projections.TransaccionProjection;
-import com.utn.springboot.billeteravirtual.entity.transacciones.TransaccionEntity;
+import com.utn.springboot.billeteravirtual.controller.dto.CuentaRequest;
 import com.utn.springboot.billeteravirtual.model.cuentas.Cuenta;
 import com.utn.springboot.billeteravirtual.model.cuentas.Transaccion;
+import com.utn.springboot.billeteravirtual.repository.entity.CuentaEntity;
+import com.utn.springboot.billeteravirtual.repository.entity.projections.TransaccionProjection;
+import com.utn.springboot.billeteravirtual.repository.entity.transacciones.TransaccionEntity;
 import org.springframework.stereotype.Component;
 
 // Un mapper es una clase que se utiliza para convertir un objeto de un tipo en otro.

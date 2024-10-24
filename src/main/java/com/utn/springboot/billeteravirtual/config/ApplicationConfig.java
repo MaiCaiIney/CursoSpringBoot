@@ -8,10 +8,15 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 @Configuration
 @EnableJpaAuditing
 @EnableSpringDataWebSupport(pageSerializationMode = EnableSpringDataWebSupport.PageSerializationMode.VIA_DTO)
+@EnableScheduling
+@EnableAsync
 public class ApplicationConfig {
     @Bean
     public OpenAPI customOpenAPI() {
@@ -23,5 +28,18 @@ public class ApplicationConfig {
                 .externalDocs(new ExternalDocumentation()
                                       .description("Documentación de referencia")
                                       .url("https://swagger.io/docs/"));
+//                .components(new Components().addSecuritySchemes("basicScheme",
+//                                                                new SecurityScheme().type(SecurityScheme.Type.HTTP).scheme("basic")))
+//                .security(List.of(new SecurityRequirement().addList("basicScheme")));
+    }
+
+    @Bean
+    public ThreadPoolTaskScheduler taskScheduler() {
+        ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
+        scheduler.setPoolSize(10); // Número de hilos en el pool
+        scheduler.setThreadNamePrefix("scheduled-task-");
+        scheduler.setWaitForTasksToCompleteOnShutdown(true);
+        scheduler.setAwaitTerminationSeconds(60);
+        return scheduler;
     }
 }

@@ -1,6 +1,6 @@
-package com.utn.springboot.billeteravirtual.entity.transacciones;
+package com.utn.springboot.billeteravirtual.repository.entity.transacciones;
 
-import com.utn.springboot.billeteravirtual.entity.CuentaEntity;
+import com.utn.springboot.billeteravirtual.repository.entity.CuentaEntity;
 import com.utn.springboot.billeteravirtual.types.TipoTransaccion;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;

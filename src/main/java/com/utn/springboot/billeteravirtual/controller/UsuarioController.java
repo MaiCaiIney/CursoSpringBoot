@@ -1,6 +1,6 @@
 package com.utn.springboot.billeteravirtual.controller;
 
-import com.utn.springboot.billeteravirtual.dto.UsuarioRequest;
+import com.utn.springboot.billeteravirtual.controller.dto.UsuarioRequest;
 import com.utn.springboot.billeteravirtual.exception.UsuarioNoExistenteException;
 import com.utn.springboot.billeteravirtual.model.Usuario;
 import com.utn.springboot.billeteravirtual.model.cuentas.Cuenta;
@@ -166,6 +166,7 @@ public class UsuarioController {
         return cuentaService.obtenerCuentasPorUsuario(id);
     }
 
+    @Operation(summary = "Obtener todos los usuarios con sus cuentas")
     @GetMapping("/cuentas")
     public List<Usuario> obtenerTodosUsuariosConCuentas() {
         return usuarioService.obtenerUsuariosConCuentas();

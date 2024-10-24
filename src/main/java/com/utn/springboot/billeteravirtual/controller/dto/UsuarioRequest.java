@@ -1,4 +1,4 @@
-package com.utn.springboot.billeteravirtual.dto;
+package com.utn.springboot.billeteravirtual.controller.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;

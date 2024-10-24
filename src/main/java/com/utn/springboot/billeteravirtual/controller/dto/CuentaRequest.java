@@ -1,4 +1,4 @@
-package com.utn.springboot.billeteravirtual.dto;
+package com.utn.springboot.billeteravirtual.controller.dto;
 
 import com.utn.springboot.billeteravirtual.types.TipoCuenta;
 import com.utn.springboot.billeteravirtual.types.TipoMoneda;

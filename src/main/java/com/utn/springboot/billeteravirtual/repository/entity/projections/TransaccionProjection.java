@@ -1,4 +1,4 @@
-package com.utn.springboot.billeteravirtual.entity.projections;
+package com.utn.springboot.billeteravirtual.repository.entity.projections;
 
 import com.utn.springboot.billeteravirtual.types.TipoTransaccion;
 

@@ -1,5 +1,6 @@
-package com.utn.springboot.billeteravirtual.entity;
+package com.utn.springboot.billeteravirtual.repository.entity;
 
+import com.utn.springboot.billeteravirtual.repository.entity.transacciones.PagoProgramadoEntity;
 import com.utn.springboot.billeteravirtual.types.EstadoUsuario;
 import jakarta.persistence.*;
 
@@ -42,7 +43,14 @@ public class UsuarioEntity extends Auditable<String> {
     @ManyToMany(mappedBy = "usuarios", fetch = FetchType.LAZY)
     private List<NotificacionEntity> notificaciones;
 
+    @OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY)
+    private List<PagoProgramadoEntity> pagosProgramados;
+
     public UsuarioEntity() {
+    }
+
+    public UsuarioEntity(Long id) {
+        this.id = id;
     }
 
     public UsuarioEntity(String nombre, String email, Integer edad) {

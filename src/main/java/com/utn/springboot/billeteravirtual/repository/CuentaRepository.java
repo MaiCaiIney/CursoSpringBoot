@@ -1,6 +1,6 @@
 package com.utn.springboot.billeteravirtual.repository;
 
-import com.utn.springboot.billeteravirtual.entity.CuentaEntity;
+import com.utn.springboot.billeteravirtual.repository.entity.CuentaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

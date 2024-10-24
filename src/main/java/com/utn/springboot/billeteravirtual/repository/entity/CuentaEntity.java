@@ -1,6 +1,6 @@
-package com.utn.springboot.billeteravirtual.entity;
+package com.utn.springboot.billeteravirtual.repository.entity;
 
-import com.utn.springboot.billeteravirtual.entity.transacciones.TransaccionEntity;
+import com.utn.springboot.billeteravirtual.repository.entity.transacciones.TransaccionEntity;
 import com.utn.springboot.billeteravirtual.types.TipoCuenta;
 import com.utn.springboot.billeteravirtual.types.TipoMoneda;
 import jakarta.persistence.*;

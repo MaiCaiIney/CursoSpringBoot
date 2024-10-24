@@ -1,4 +1,4 @@
-package com.utn.springboot.billeteravirtual.entity.transacciones;
+package com.utn.springboot.billeteravirtual.repository.entity.transacciones;
 
 import jakarta.persistence.*;
 

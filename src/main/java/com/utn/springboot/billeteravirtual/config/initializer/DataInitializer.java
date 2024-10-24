@@ -1,25 +1,17 @@
-package com.utn.springboot.billeteravirtual.initializer;
+package com.utn.springboot.billeteravirtual.config.initializer;
 
-import com.utn.springboot.billeteravirtual.entity.CuentaEntity;
-import com.utn.springboot.billeteravirtual.entity.DireccionEntity;
-import com.utn.springboot.billeteravirtual.entity.UsuarioEntity;
-import com.utn.springboot.billeteravirtual.entity.transacciones.PagoServicioEntity;
-import com.utn.springboot.billeteravirtual.entity.transacciones.ServicioEntity;
-import com.utn.springboot.billeteravirtual.entity.transacciones.TransaccionEntity;
-import com.utn.springboot.billeteravirtual.entity.transacciones.TransferenciaEntity;
-import com.utn.springboot.billeteravirtual.repository.CuentaRepository;
-import com.utn.springboot.billeteravirtual.repository.ServicioRepository;
-import com.utn.springboot.billeteravirtual.repository.TransaccionRepository;
-import com.utn.springboot.billeteravirtual.repository.UsuarioRepository;
-import com.utn.springboot.billeteravirtual.types.TipoCuenta;
-import com.utn.springboot.billeteravirtual.types.TipoDireccion;
-import com.utn.springboot.billeteravirtual.types.TipoMoneda;
-import com.utn.springboot.billeteravirtual.types.TipoTransaccion;
+import com.utn.springboot.billeteravirtual.repository.*;
+import com.utn.springboot.billeteravirtual.repository.entity.CuentaEntity;
+import com.utn.springboot.billeteravirtual.repository.entity.DireccionEntity;
+import com.utn.springboot.billeteravirtual.repository.entity.UsuarioEntity;
+import com.utn.springboot.billeteravirtual.repository.entity.transacciones.*;
+import com.utn.springboot.billeteravirtual.types.*;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Component
 public class DataInitializer {
@@ -27,14 +19,17 @@ public class DataInitializer {
     private final CuentaRepository cuentaRepository;
     private final TransaccionRepository transaccionRepository;
     private final ServicioRepository servicioRepository;
+    private final PagoProgramadoRepository pagoProgramadoRepository;
 
     @Autowired
     public DataInitializer(UsuarioRepository usuarioRepository, CuentaRepository cuentaRepository,
-                           TransaccionRepository transaccionRepository, ServicioRepository servicioRepository) {
+                           TransaccionRepository transaccionRepository, ServicioRepository servicioRepository,
+                           PagoProgramadoRepository pagoProgramadoRepository) {
         this.usuarioRepository = usuarioRepository;
         this.cuentaRepository = cuentaRepository;
         this.transaccionRepository = transaccionRepository;
         this.servicioRepository = servicioRepository;
+        this.pagoProgramadoRepository = pagoProgramadoRepository;
     }
 
     @PostConstruct
@@ -74,8 +69,25 @@ public class DataInitializer {
                                                 new BigDecimal(40000),
                                                 TipoMoneda.ARS,
                                                 usuario1);
+
+        CuentaEntity cuenta3 = new CuentaEntity(TipoCuenta.CORRIENTE,
+                                                "1234567890123456789002",
+                                                "alias.cuenta.sueldo",
+                                                BigDecimal.ZERO,
+                                                TipoMoneda.ARS,
+                                                usuario2);
+
+        CuentaEntity cuenta4 = new CuentaEntity(TipoCuenta.AHORROS,
+                                                "1234567890123456789003",
+                                                "alias.cuenta.servicio",
+                                                BigDecimal.ZERO,
+                                                TipoMoneda.ARS,
+                                                usuario3);
+
         cuentaRepository.save(cuenta1);
         cuentaRepository.save(cuenta2);
+        cuentaRepository.save(cuenta3);
+        cuentaRepository.save(cuenta4);
 
         ServicioEntity servicio1 = new ServicioEntity("Luz", "EDEA", "301234567800");
         servicioRepository.save(servicio1);
@@ -95,5 +107,29 @@ public class DataInitializer {
         // Retiro de $1000.00 en cuenta1
         TransaccionEntity transaccionEntity = new TransaccionEntity(TipoTransaccion.RETIRO, new BigDecimal("1000.00"), cuenta1);
         transaccionRepository.save(transaccionEntity);
+
+        PagoProgramadoEntity.Builder pagoProgramadoBuilder = new PagoProgramadoEntity.Builder();
+        pagoProgramadoBuilder.setUsuario(usuario1);
+        pagoProgramadoBuilder.setCuentaOrigen(cuenta1);
+        pagoProgramadoBuilder.setCuentaDestino(cuenta3);
+        pagoProgramadoBuilder.setMonto(new BigDecimal("200000.00"));
+        pagoProgramadoBuilder.setTipoPago(TipoPagoProgramado.SUELDO);
+        pagoProgramadoBuilder.setFrecuencia(FrecuenciaPagoProgramado.MENSUAL);
+        pagoProgramadoBuilder.setFechaInicio(LocalDate.of(2023, 10, 20).atStartOfDay());
+        pagoProgramadoBuilder.setEstado(EstadoPagoProgramado.ACTIVO);
+        pagoProgramadoBuilder.setProximaEjecucion(LocalDate.of(2023, 10, 22).atStartOfDay());
+        pagoProgramadoRepository.save(pagoProgramadoBuilder.build());
+
+        PagoProgramadoEntity.Builder pagoProgramadoBuilder2 = new PagoProgramadoEntity.Builder();
+        pagoProgramadoBuilder2.setUsuario(usuario1);
+        pagoProgramadoBuilder2.setCuentaOrigen(cuenta2);
+        pagoProgramadoBuilder2.setCuentaDestino(cuenta4);
+        pagoProgramadoBuilder2.setMonto(new BigDecimal("5000.00"));
+        pagoProgramadoBuilder2.setTipoPago(TipoPagoProgramado.SERVICIO);
+        pagoProgramadoBuilder2.setFrecuencia(FrecuenciaPagoProgramado.SEMANAL);
+        pagoProgramadoBuilder2.setFechaInicio(LocalDate.of(2023, 10, 20).atStartOfDay());
+        pagoProgramadoBuilder2.setEstado(EstadoPagoProgramado.ACTIVO);
+        pagoProgramadoBuilder2.setProximaEjecucion(LocalDate.of(2023, 10, 22).atStartOfDay());
+        pagoProgramadoRepository.save(pagoProgramadoBuilder2.build());
     }
 }

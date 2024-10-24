@@ -1,4 +1,4 @@
-package com.utn.springboot.billeteravirtual.entity;
+package com.utn.springboot.billeteravirtual.repository.entity;
 
 import com.utn.springboot.billeteravirtual.types.TipoDireccion;
 import jakarta.persistence.*;

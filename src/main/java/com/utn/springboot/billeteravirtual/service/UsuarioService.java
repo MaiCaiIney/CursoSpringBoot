@@ -1,11 +1,11 @@
 package com.utn.springboot.billeteravirtual.service;
 
-import com.utn.springboot.billeteravirtual.entity.DireccionEntity;
-import com.utn.springboot.billeteravirtual.entity.UsuarioEntity;
 import com.utn.springboot.billeteravirtual.exception.UsuarioNoExistenteException;
-import com.utn.springboot.billeteravirtual.mapper.CuentaMapper;
 import com.utn.springboot.billeteravirtual.model.Usuario;
+import com.utn.springboot.billeteravirtual.model.mapper.CuentaMapper;
 import com.utn.springboot.billeteravirtual.repository.UsuarioRepository;
+import com.utn.springboot.billeteravirtual.repository.entity.DireccionEntity;
+import com.utn.springboot.billeteravirtual.repository.entity.UsuarioEntity;
 import com.utn.springboot.billeteravirtual.utils.Utilidades;
 import com.utn.springboot.billeteravirtual.utils.log.CodigoLog;
 import com.utn.springboot.billeteravirtual.utils.log.Log;
@@ -25,15 +25,15 @@ public class UsuarioService {
     private final UsuarioRepository repository;
     private final Utilidades utilidades;
     private final Log log;
+    private final CuentaMapper cuentaMapper;
 
     @Autowired
-    private CuentaMapper cuentaMapper;
-
-    @Autowired
-    public UsuarioService(UsuarioRepository repository, Utilidades utilidades, @Qualifier("consoleLog") Log logService) {
+    public UsuarioService(UsuarioRepository repository, Utilidades utilidades, @Qualifier("consoleLog") Log logService,
+                          CuentaMapper cuentaMapper) {
         this.repository = repository;
         this.utilidades = utilidades;
         this.log = logService;
+        this.cuentaMapper = cuentaMapper;
     }
 
     // Método para obtener todos los usuarios
@@ -122,6 +122,10 @@ public class UsuarioService {
             entity.getCuentas().stream().map(cuentaMapper::toModel).forEach(model::agregarCuenta);
             return model;
         }).collect(Collectors.toList());
+    }
+
+    protected UsuarioEntity buscarEntidadPorId(Long id) throws UsuarioNoExistenteException {
+        return repository.findById(id).orElseThrow(() -> new UsuarioNoExistenteException(id));
     }
 
     private Usuario convertirEntityAUsuario(UsuarioEntity usuarioEntity) {

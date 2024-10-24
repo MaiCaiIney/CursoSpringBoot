@@ -1,9 +1,9 @@
 package com.utn.springboot.billeteravirtual.controller;
 
-import com.utn.springboot.billeteravirtual.dto.CuentaRequest;
-import com.utn.springboot.billeteravirtual.mapper.CuentaMapper;
+import com.utn.springboot.billeteravirtual.controller.dto.CuentaRequest;
 import com.utn.springboot.billeteravirtual.model.cuentas.Cuenta;
 import com.utn.springboot.billeteravirtual.model.cuentas.Transaccion;
+import com.utn.springboot.billeteravirtual.model.mapper.CuentaMapper;
 import com.utn.springboot.billeteravirtual.service.CuentaService;
 import com.utn.springboot.billeteravirtual.types.TipoMoneda;
 import io.swagger.v3.oas.annotations.Operation;
