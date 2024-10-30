@@ -121,4 +121,8 @@ public class UsuarioEntity extends Auditable<String> {
     public List<NotificacionEntity> getNotificaciones() {
         return notificaciones;
     }
+
+    public List<PagoProgramadoEntity> getPagosProgramados() {
+        return pagosProgramados;
+    }
 }

@@ -4,9 +4,11 @@ import com.utn.springboot.billeteravirtual.types.TipoCuenta;
 import com.utn.springboot.billeteravirtual.types.TipoMoneda;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
 
 import java.math.BigDecimal;
 
+@Getter
 @Schema(description = "Payload para la creación de una cuenta")
 public class CuentaRequest {
     @Schema(description = "Tipo de cuenta", example = "AHORROS", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -25,19 +27,4 @@ public class CuentaRequest {
     @NotNull
     private TipoMoneda tipoMoneda;
 
-    public TipoCuenta getTipoCuenta() {
-        return tipoCuenta;
-    }
-
-    public Long getIdUsuario() {
-        return idUsuario;
-    }
-
-    public BigDecimal getBalance() {
-        return balance;
-    }
-
-    public TipoMoneda getTipoMoneda() {
-        return tipoMoneda;
-    }
 }

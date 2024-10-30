@@ -1,6 +1,7 @@
 package com.utn.springboot.billeteravirtual.config.initializer;
 
 import com.utn.springboot.billeteravirtual.repository.*;
+import com.utn.springboot.billeteravirtual.repository.entity.CredencialEntity;
 import com.utn.springboot.billeteravirtual.repository.entity.CuentaEntity;
 import com.utn.springboot.billeteravirtual.repository.entity.DireccionEntity;
 import com.utn.springboot.billeteravirtual.repository.entity.UsuarioEntity;
@@ -8,6 +9,7 @@ import com.utn.springboot.billeteravirtual.repository.entity.transacciones.*;
 import com.utn.springboot.billeteravirtual.types.*;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -20,16 +22,21 @@ public class DataInitializer {
     private final TransaccionRepository transaccionRepository;
     private final ServicioRepository servicioRepository;
     private final PagoProgramadoRepository pagoProgramadoRepository;
+    private final CredencialRepository credencialRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     public DataInitializer(UsuarioRepository usuarioRepository, CuentaRepository cuentaRepository,
                            TransaccionRepository transaccionRepository, ServicioRepository servicioRepository,
-                           PagoProgramadoRepository pagoProgramadoRepository) {
+                           PagoProgramadoRepository pagoProgramadoRepository, CredencialRepository credencialRepository) {
         this.usuarioRepository = usuarioRepository;
         this.cuentaRepository = cuentaRepository;
         this.transaccionRepository = transaccionRepository;
         this.servicioRepository = servicioRepository;
         this.pagoProgramadoRepository = pagoProgramadoRepository;
+        this.credencialRepository = credencialRepository;
     }
 
     @PostConstruct
@@ -48,6 +55,13 @@ public class DataInitializer {
                                                          "Buenos Aires",
                                                          TipoDireccion.CASA);
         usuario1.setDireccion(direccion1);
+
+        String password1 = passwordEncoder.encode("profe");
+        CredencialEntity credencialEntity1 = new CredencialEntity("profe", password1, usuario1);
+        credencialRepository.save(credencialEntity1);
+
+        CredencialEntity credencialEntity2 = new CredencialEntity("alumno", passwordEncoder.encode("pass"), usuario2);
+        credencialRepository.save(credencialEntity2);
 
         usuarioRepository.save(usuario1);
         usuarioRepository.save(usuario2);

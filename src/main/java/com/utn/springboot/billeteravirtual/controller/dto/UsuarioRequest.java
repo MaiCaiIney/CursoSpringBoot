@@ -2,7 +2,9 @@ package com.utn.springboot.billeteravirtual.controller.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
+import lombok.Getter;
 
+@Getter
 @Schema(description = "Payload para la creación de un usuario")
 public class UsuarioRequest {
     @Schema(description = "Nombre completo del usuario", example = "Mai Prueba")
@@ -19,15 +21,4 @@ public class UsuarioRequest {
     @Max(99)
     private int edad;
 
-    public String getNombre() {
-        return nombre;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public int getEdad() {
-        return edad;
-    }
 }
