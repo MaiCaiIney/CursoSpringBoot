@@ -56,8 +56,7 @@ public class DataInitializer {
                                                          TipoDireccion.CASA);
         usuario1.setDireccion(direccion1);
 
-        String password1 = passwordEncoder.encode("profe");
-        CredencialEntity credencialEntity1 = new CredencialEntity("profe", password1, usuario1);
+        CredencialEntity credencialEntity1 = new CredencialEntity("profe", passwordEncoder.encode("profe"), usuario1);
         credencialRepository.save(credencialEntity1);
 
         CredencialEntity credencialEntity2 = new CredencialEntity("alumno", passwordEncoder.encode("pass"), usuario2);

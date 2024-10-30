@@ -1,9 +1,12 @@
 package com.utn.springboot.billeteravirtual.config;
 
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.ExternalDocumentation;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
@@ -11,6 +14,8 @@ import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+
+import java.util.List;
 
 @Configuration
 @EnableJpaAuditing
@@ -27,10 +32,9 @@ public class ApplicationConfig {
                               .license(new License().name("Apache 2.0").url("http://springdoc.org")))
                 .externalDocs(new ExternalDocumentation()
                                       .description("Documentación de referencia")
-                                      .url("https://swagger.io/docs/"));
-//                .components(new Components().addSecuritySchemes("basicScheme",
-//                                                                new SecurityScheme().type(SecurityScheme.Type.HTTP).scheme("basic")))
-//                .security(List.of(new SecurityRequirement().addList("basicScheme")));
+                                      .url("https://swagger.io/docs/"))
+                .components(new Components().addSecuritySchemes("Bearer Authentication", createAPIKeyScheme()))
+                .security(List.of(new SecurityRequirement().addList("Bearer Authentication")));
     }
 
     @Bean
@@ -41,5 +45,11 @@ public class ApplicationConfig {
         scheduler.setWaitForTasksToCompleteOnShutdown(true);
         scheduler.setAwaitTerminationSeconds(60);
         return scheduler;
+    }
+
+    private SecurityScheme createAPIKeyScheme() {
+        return new SecurityScheme().type(SecurityScheme.Type.HTTP)
+                .bearerFormat("JWT")
+                .scheme("bearer");
     }
 }
