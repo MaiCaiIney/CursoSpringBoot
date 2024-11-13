@@ -39,6 +39,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/public").permitAll()
                         .requestMatchers(HttpMethod.POST, "/public").authenticated()
                         .requestMatchers(HttpMethod.GET, "/admin/archivos").hasAuthority(RolUsuario.AUDITOR.name())
+                        .requestMatchers(HttpMethod.POST, "/admin/archivos").hasAuthority(RolUsuario.AUDITOR.name())
                         .requestMatchers(HttpMethod.GET, "/admin").hasAuthority(RolUsuario.ADMIN.name())
                         .requestMatchers(HttpMethod.POST, "/cuentas").hasAuthority(RolUsuario.ADMIN.name())
                         .requestMatchers("/cuentas/**").hasRole("USUARIO")
