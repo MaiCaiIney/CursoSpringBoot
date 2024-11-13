@@ -2,11 +2,10 @@ package com.utn.springboot.billeteravirtual.service;
 
 import com.utn.springboot.billeteravirtual.controller.dto.AuthRequest;
 import com.utn.springboot.billeteravirtual.repository.CredencialRepository;
-import com.utn.springboot.billeteravirtual.repository.entity.CredencialEntity;
+import com.utn.springboot.billeteravirtual.repository.entity.security.CredencialEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -17,8 +16,7 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
 
     @Autowired
-    public AuthService(CredencialRepository credencialRepository, AuthenticationManager authenticationManager,
-                       PasswordEncoder passwordEncoder) {
+    public AuthService(CredencialRepository credencialRepository, AuthenticationManager authenticationManager) {
         this.credencialRepository = credencialRepository;
         this.authenticationManager = authenticationManager;
     }

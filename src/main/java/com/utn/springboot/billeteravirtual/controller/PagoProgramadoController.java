@@ -59,6 +59,7 @@ public class PagoProgramadoController {
         return pagoProgramadoService.actualizarMonto(pagoId, monto);
     }
 
+    // Este e
     private PagoProgramado mapRequestToModel(PagoProgramadoRequest request) {
         return new PagoProgramado.Builder()
                 .setTipoPago(request.tipoPagoProgramado())

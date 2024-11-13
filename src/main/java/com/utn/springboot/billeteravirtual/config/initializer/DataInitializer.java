@@ -1,10 +1,13 @@
 package com.utn.springboot.billeteravirtual.config.initializer;
 
 import com.utn.springboot.billeteravirtual.repository.*;
-import com.utn.springboot.billeteravirtual.repository.entity.CredencialEntity;
 import com.utn.springboot.billeteravirtual.repository.entity.CuentaEntity;
 import com.utn.springboot.billeteravirtual.repository.entity.DireccionEntity;
 import com.utn.springboot.billeteravirtual.repository.entity.UsuarioEntity;
+import com.utn.springboot.billeteravirtual.repository.entity.security.CredencialEntity;
+import com.utn.springboot.billeteravirtual.repository.entity.security.PerfilEntity;
+import com.utn.springboot.billeteravirtual.repository.entity.security.PermisoEntity;
+import com.utn.springboot.billeteravirtual.repository.entity.security.RolEntity;
 import com.utn.springboot.billeteravirtual.repository.entity.transacciones.*;
 import com.utn.springboot.billeteravirtual.types.*;
 import jakarta.annotation.PostConstruct;
@@ -14,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Set;
 
 @Component
 public class DataInitializer {
@@ -23,7 +27,12 @@ public class DataInitializer {
     private final ServicioRepository servicioRepository;
     private final PagoProgramadoRepository pagoProgramadoRepository;
     private final CredencialRepository credencialRepository;
-
+    @Autowired
+    private PermisoRepository permisoRepository;
+    @Autowired
+    private RolRepository rolRepository;
+    @Autowired
+    private PerfilRepository perfilRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
 
@@ -41,33 +50,96 @@ public class DataInitializer {
 
     @PostConstruct
     public void init() {
-        UsuarioEntity usuario1 = new UsuarioEntity("Juan Perez", "juan.perez@example.com", 35);
+        PermisoEntity permiso1 = new PermisoEntity(PermisoUsuario.CREAR_USUARIO, "Dar de alta un nuevo usuario en el sistema");
+        permiso1 = permisoRepository.save(permiso1);
+        PermisoEntity permiso2 = new PermisoEntity(PermisoUsuario.ELIMINAR_USUARIO, "Eliminar un usuario del sistema");
+        permiso2 = permisoRepository.save(permiso2);
+        PermisoEntity permiso3 = new PermisoEntity(PermisoUsuario.VER_TRANSACCIONES, "Visualizar las transacciones de una cuenta");
+        permiso3 = permisoRepository.save(permiso3);
+        PermisoEntity permiso4 = new PermisoEntity(PermisoUsuario.EDITAR_CUENTA, "Modificar los datos de una cuenta");
+        permiso4 = permisoRepository.save(permiso4);
+        PermisoEntity permiso5 = new PermisoEntity(PermisoUsuario.DEPOSITAR_FONDOS, "Realizar un depósito en una cuenta");
+        permiso5 = permisoRepository.save(permiso5);
+        PermisoEntity permiso6 = new PermisoEntity(PermisoUsuario.TRANSFERIR_FONDOS, "Transferir fondos entre cuentas");
+        permiso6 = permisoRepository.save(permiso6);
+        PermisoEntity permiso7 = new PermisoEntity(PermisoUsuario.RETIRAR_FONDOS, "Retirar fondos de una cuenta");
+        permiso7 = permisoRepository.save(permiso7);
+        PermisoEntity permiso8 = new PermisoEntity(PermisoUsuario.PROGRAMAR_PAGO, "Programar un pago");
+        permiso8 = permisoRepository.save(permiso8);
+        PermisoEntity permiso9 = new PermisoEntity(PermisoUsuario.VER_PAGOS_PROGRAMADOS, "Visualizar los pagos programados");
+        permiso9 = permisoRepository.save(permiso9);
+
+        // El rol de usuario tiene permisos para ver transacciones, depositar fondos, transferir fondos y retirar fondos
+        RolEntity rolUser = new RolEntity(RolUsuario.ROLE_USUARIO);
+        rolUser.agregarPermiso(permiso3);
+        rolUser.agregarPermiso(permiso5);
+        rolUser.agregarPermiso(permiso6);
+        rolUser.agregarPermiso(permiso7);
+        rolUser = rolRepository.save(rolUser);
+
+        // El rol de administrador tiene permisos para crear y eliminar usuarios, y programar pagos
+        RolEntity rolAdmin = new RolEntity(RolUsuario.ADMIN);
+        rolAdmin.agregarPermiso(permiso1);
+        rolAdmin.agregarPermiso(permiso2);
+        rolAdmin.agregarPermiso(permiso8);
+        rolAdmin = rolRepository.save(rolAdmin);
+
+        // El rol de manager tiene permisos para editar cuentas y programar pagos
+        RolEntity rolManager = new RolEntity(RolUsuario.MANAGER);
+        rolManager.agregarPermiso(permiso4);
+        rolManager.agregarPermiso(permiso8);
+        rolManager = rolRepository.save(rolManager);
+
+        // El rol de auditor tiene permisos para ver transacciones y ver pagos programados
+        RolEntity rolAuditor = new RolEntity(RolUsuario.AUDITOR);
+        rolAuditor.agregarPermiso(permiso3);
+        rolAuditor.agregarPermiso(permiso9);
+        rolAuditor = rolRepository.save(rolAuditor);
+
+        PerfilEntity perfilUsuario = new PerfilEntity(PerfilUsuario.PERFIL_USUARIO);
+        perfilUsuario.agregarRol(rolUser);
+        perfilUsuario = perfilRepository.save(perfilUsuario);
+
+        PerfilEntity perfilAdmin = new PerfilEntity(PerfilUsuario.PERFIL_ADMIN);
+        perfilAdmin.agregarRol(rolAdmin);
+        perfilAdmin.agregarRol(rolManager);
+        perfilAdmin.agregarRol(rolAuditor);
+        perfilAdmin = perfilRepository.save(perfilAdmin);
+
+        PerfilEntity perfilSupervisor = new PerfilEntity(PerfilUsuario.PERFIL_SUPERVISOR);
+        perfilSupervisor.agregarRol(rolManager);
+        perfilSupervisor.agregarRol(rolAuditor);
+        perfilSupervisor = perfilRepository.save(perfilSupervisor);
+
+        PerfilEntity perfilAnalista = new PerfilEntity(PerfilUsuario.PERFIL_ANALISTA);
+        perfilAnalista.agregarRol(rolAuditor);
+        perfilAnalista = perfilRepository.save(perfilAnalista);
+
+        UsuarioEntity usuario1 = new UsuarioEntity("Mai Berterreche", "maicaberterreche@gmail.com", 34);
         UsuarioEntity usuario2 = new UsuarioEntity("Ana Garcia", "ana.garcia@example.com", 22);
         UsuarioEntity usuario3 = new UsuarioEntity("Jose Morales", "jose.morales@example.com", 45);
         UsuarioEntity usuario4 = new UsuarioEntity("Maria Rodriguez", "maria.rodriguez@example.com", 52);
         UsuarioEntity usuario5 = new UsuarioEntity("Carlos Sanchez", "carlos.sanchez@example.com", 60);
         UsuarioEntity usuario6 = new UsuarioEntity("Laura Fernandez", "laura.fernandez@example.com", 37);
 
-        DireccionEntity direccion1 = new DireccionEntity("Calle 1",
-                                                         "123",
-                                                         "PB C",
-                                                         "Mar del Plata",
-                                                         "Buenos Aires",
-                                                         TipoDireccion.CASA);
-        usuario1.setDireccion(direccion1);
-
-        CredencialEntity credencialEntity1 = new CredencialEntity("profe", passwordEncoder.encode("profe"), usuario1);
+        CredencialEntity credencialEntity1 = new CredencialEntity("profe", passwordEncoder.encode("profe"), usuario1, perfilAdmin);
         credencialRepository.save(credencialEntity1);
 
-        CredencialEntity credencialEntity2 = new CredencialEntity("alumno", passwordEncoder.encode("pass"), usuario2);
+        CredencialEntity credencialEntity2 = new CredencialEntity("alumno", passwordEncoder.encode("alumno"), usuario2, perfilAnalista);
+        credencialEntity2.agregarRol(rolManager);
         credencialRepository.save(credencialEntity2);
 
-        usuarioRepository.save(usuario1);
-        usuarioRepository.save(usuario2);
-        usuarioRepository.save(usuario3);
-        usuarioRepository.save(usuario4);
-        usuarioRepository.save(usuario5);
-        usuarioRepository.save(usuario6);
+        CredencialEntity credencialEntity3 = new CredencialEntity("jose", passwordEncoder.encode("jose"), usuario3, perfilUsuario);
+        credencialRepository.save(credencialEntity3);
+
+        CredencialEntity credencialEntity4 = new CredencialEntity("maria", passwordEncoder.encode("maria"), usuario4, perfilUsuario);
+        credencialRepository.save(credencialEntity4);
+
+        CredencialEntity credencialEntity5 = new CredencialEntity("carlos", passwordEncoder.encode("carlos"), usuario5, perfilUsuario);
+        credencialRepository.save(credencialEntity5);
+
+        CredencialEntity credencialEntity6 = new CredencialEntity("laura", passwordEncoder.encode("laura"), usuario6, perfilUsuario);
+        credencialRepository.save(credencialEntity6);
 
         CuentaEntity cuenta1 = new CuentaEntity(TipoCuenta.AHORROS,
                                                 "1234567890123456789000",

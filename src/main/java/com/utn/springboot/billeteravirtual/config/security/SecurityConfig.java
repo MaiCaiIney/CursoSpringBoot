@@ -1,5 +1,6 @@
 package com.utn.springboot.billeteravirtual.config.security;
 
+import com.utn.springboot.billeteravirtual.types.RolUsuario;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,9 +35,13 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**", "/swagger-ui/**", "/v3/api-docs*/**", "/h2-console/**").permitAll()
+                        .requestMatchers("/auth/**", "/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs*/**", "/h2-console/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/public").permitAll()
                         .requestMatchers(HttpMethod.POST, "/public").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/admin/archivos").hasAuthority(RolUsuario.AUDITOR.name())
+                        .requestMatchers(HttpMethod.GET, "/admin").hasAuthority(RolUsuario.ADMIN.name())
+                        .requestMatchers(HttpMethod.POST, "/cuentas").hasAuthority(RolUsuario.ADMIN.name())
+                        .requestMatchers("/cuentas/**").hasRole("USUARIO")
                         .anyRequest().authenticated())
                 .csrf(AbstractHttpConfigurer::disable)
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))

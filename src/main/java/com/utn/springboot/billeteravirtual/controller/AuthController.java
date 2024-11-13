@@ -3,7 +3,7 @@ package com.utn.springboot.billeteravirtual.controller;
 import com.utn.springboot.billeteravirtual.config.security.JwtService;
 import com.utn.springboot.billeteravirtual.controller.dto.AuthRequest;
 import com.utn.springboot.billeteravirtual.controller.dto.AuthResponse;
-import com.utn.springboot.billeteravirtual.repository.entity.CredencialEntity;
+import com.utn.springboot.billeteravirtual.repository.entity.security.CredencialEntity;
 import com.utn.springboot.billeteravirtual.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
