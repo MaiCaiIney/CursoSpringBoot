@@ -31,7 +31,7 @@
             .then(response => response.json())
             .then(data => {
                 // Assuming the 'name' attribute is available in the response
-                document.getElementById('username').textContent = data.login || 'Usuario';
+                document.getElementById('username').textContent = data.email || 'Usuario';
             })
             .catch(error => {
                 console.error('Error fetching user data:', error);
