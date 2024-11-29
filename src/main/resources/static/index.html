@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        .greeting {
+            font-size: 2em;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div class="greeting">
+    Hola, <span id="username"></span>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Fetch the authenticated user's information from the /me endpoint
+        fetch('/auth/me')
+            .then(response => response.json())
+            .then(data => {
+                // Assuming the 'name' attribute is available in the response
+                document.getElementById('username').textContent = data.login || 'Usuario';
+            })
+            .catch(error => {
+                console.error('Error fetching user data:', error);
+                document.getElementById('username').textContent = 'Usuario';
+            });
+    });
+</script>
+</body>
+</html>

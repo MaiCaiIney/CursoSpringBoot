@@ -6,10 +6,11 @@ import com.utn.springboot.billeteravirtual.controller.dto.AuthResponse;
 import com.utn.springboot.billeteravirtual.repository.entity.security.CredencialEntity;
 import com.utn.springboot.billeteravirtual.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RequestMapping("/auth")
 @RestController
@@ -32,5 +33,10 @@ public class AuthController {
         String jwtToken = jwtService.generateToken(authenticatedUser);
 
         return new AuthResponse(jwtToken);
+    }
+
+    @GetMapping("/me")
+    public Map<String, Object> user(@AuthenticationPrincipal OAuth2User principal) {
+        return principal.getAttributes(); // Devuelve los atributos del usuario autenticado
     }
 }
